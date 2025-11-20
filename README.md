@@ -113,3 +113,15 @@ Use the GitHub UI to monitor your pipeline execution:
 
 ![GitHub CICD Pipeline apickli](./img/GitHubUI-4.png)<BR>&nbsp;<BR>
 
+
+
+# stay on your current branch with the changes
+git checkout feature/intial-commit-placeholder
+
+# create Jira-style branch from the same commit
+git checkout -b DPEAPI-18548-design-layout
+
+# push new branch
+git push -u origin DPEAPI-18548-design-layout
+
+
