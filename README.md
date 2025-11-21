@@ -113,3 +113,101 @@ Use the GitHub UI to monitor your pipeline execution:
 
 ![GitHub CICD Pipeline apickli](./img/GitHubUI-4.png)<BR>&nbsp;<BR>
 
+
+
+
+### 1️⃣ “Use something that contains SYSGEN like SYSGEN123456789”
+
+**Reply:**
+
+> Updated all example MAL names to use the `SYSGEN123456789` style instead of simple numeric IDs.
+> For example, the main MAL folder is now shown as `mal-SYSGEN123456789/`, and the sample product is `SYSGEN123456789-my-product.yaml`.
+
+---
+
+### 2️⃣ “Adding a new MAL – example MAL code (1234567)”
+
+**Reply:**
+
+> Adjusted the “Adding a new MAL” example to use a SYSGEN-style code.
+> The onboarding doc now shows:
+>
+> * MAL folder: `mal-SYSGEN123456789/`
+> * Proxy: `SYSGEN123456789-my-api`
+> * Product: `SYSGEN123456789-my-product.yaml`.
+
+---
+
+### 3️⃣ “Only MALs that have changes is a little too broad”
+
+**Reply:**
+
+> Reworded this section to be more precise.
+> It now reads along the lines of:
+> *“Only MAL resources (proxies, products, KVMs, etc.) under MAL folders that changed in the PR are targeted by deployments (future optimisation – the current template just echoes what it would do).”*
+
+---
+
+### 4️⃣ “Prerequisites – not all API teams will have Products / API proxy must exist first”
+
+**Reply:**
+
+> Updated the onboarding prerequisites to separate the concepts:
+>
+> * Clarified that **a MAL code and owning GitHub team** are required.
+> * Noted that having at least one **API proxy identified** is required before wiring products.
+> * Marked product creation as a step that “may not apply to all API producer teams.”
+
+---
+
+### 5️⃣ “At least one API proxy and product identified” (wording)
+
+**Reply:**
+
+> Tweaked the prerequisite text as suggested:
+>
+> * It no longer assumes every team has a product on day one.
+> * It now says that teams must identify **at least one API proxy** and optionally any initial products they plan to use.
+
+---
+
+### 6️⃣ “Emulate GitOps structure – products by org, etc.”
+
+**Reply:**
+
+> Clarified in the README that:
+>
+> * This repo is **application/MAL-focused**, not the platform GitOps repo.
+> * Products are still org-level in Apigee, but in this repo they are grouped under `mal-<MAL_CODE>/products/` purely for **ownership and convenience**.
+>   Also added a note that platform-level structure (org folders, sharedflows, etc.) stays in the enterprise GitOps repo.
+
+---
+
+### 7️⃣ “Deploy workflows do nothing – add guidance on checking Actions / SYS GEN in name”
+
+**Reply:**
+
+> Expanded the troubleshooting section for deploy workflows:
+>
+> * Stated explicitly that in this template the deploy workflows **only echo what they would do**.
+> * Added guidance that, once real deployments are enabled, teams should verify runs via GitHub Actions and can filter by MAL/SYSGEN in the workflow or deployment name to find their runs.
+
+---
+
+### 8️⃣ “Looks amazing guys! See my comments.” (general wrap-up)
+
+**Reply (top-level PR comment):**
+
+> Thanks for the detailed review and suggestions.
+> I’ve:
+>
+> * Switched all examples to use `SYSGEN123456789`-style IDs.
+> * Clarified the MAL folder structure and env layout under each proxy.
+> * Tightened the wording around “only MALs that changed” to focus on MAL resources affected by the PR.
+> * Updated onboarding prerequisites around proxies vs. products.
+> * Documented the separation between this application/MAL repo and the platform GitOps repo.
+> * Expanded the troubleshooting text for deploy workflows as you suggested.
+>   Please let me know if you’d like anything further refined.
+
+
+
