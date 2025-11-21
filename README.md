@@ -209,6 +209,21 @@ Use the GitHub UI to monitor your pipeline execution:
 >   Please let me know if you’d like anything further refined.
 
 
+### **🔍 Deployment Scope (Updated Per PR Review)**
+
+**Only MAL resources that changed will be targeted by deployments.**  
+Specifically, when a PR is merged, the workflow detects which  
+`mal-<SYSGEN_CODE>/` folders were modified and limits deployment to:
+
+- updated proxies  
+- updated API products  
+- updated KVMs  
+
+> *Note: In this starter repository, the deployment workflow currently only  
+> **echoes** what it would do. Actual deployment logic will be enabled later  
+> as part of the enterprise GitOps integration.*
+
+
 
 
 
