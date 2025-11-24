@@ -225,7 +225,8 @@ Specifically, when a PR is merged, the workflow detects which
 
 Hi all, I’ve pushed updates based on the PR feedback that was shared. Whenever you get a chance, please feel free to take a look and let me know if anything else is needed
 
-Hey Ryan, I’ve pushed updates to the Apigee X PR based on Jeremy’s comments. Jeremy is OOO, so whenever you have some time, could you please take a look and let me know if anything else is needed?
+Hey Ryan, I’ve pushed updates to the Apigee X PR based on Jeremy’s comments. Jeremy is not available, so whenever you have some time, could you please take a look and let me know if anything else is needed?
+
 
 
 
