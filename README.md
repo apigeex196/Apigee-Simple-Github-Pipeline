@@ -223,6 +223,8 @@ Specifically, when a PR is merged, the workflow detects which
 > **echoes** what it would do. Actual deployment logic will be enabled later  
 > as part of the enterprise GitOps integration.*
 
+Hi all, I’ve pushed updates based on the PR feedback that was shared. Whenever you get a chance, please feel free to take a look and let me know if anything else is needed
+
 
 
 
