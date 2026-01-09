@@ -5,231 +5,470 @@
 **This is not an official Google product.**<BR>This implementation is not an official Google product, nor is it part of an official Google product. Support is available on a best-effort basis via GitHub.
 
 ***
-
-  
-
-## Goal
-
-Simple implementation for a CI/CD pipeline for Apigee using GitHub repository, 
-[CI/CD with GitHub](https://docs.GitHub.com/ee/ci/introduction/) and the Apigee Maven Plugins.
-
-The CICD pipeline includes:
-
-- Git branch dependent Apigee environment selection and proxy naming to allow
-  deployment of feature branches as separate proxies in the same environment
-- Open API Specification (Swagger) static code analysis using [stoplight spectral](https://github.com/stoplightio/spectral)
-- Static Apigee Proxy code analysis using [apigeelint](https://github.com/apigee/apigeelint)
-- Static JS code analysis using [eslint](https://eslint.org/)
-- Unit JS testing using [mocha](https://mochajs.org/)
-- Integration testing of the deployed proxy using
-  [apickli](https://github.com/apickli/apickli)
-- Packaging and deployment of an Apigee configuration using
-  [Apigee Config Maven Plugin](https://github.com/apigee/apigee-config-maven-plugin)
-- Packaging and deployment of the API proxy bundle using
-  [Apigee Deploy Maven Plugin](https://github.com/apigee/apigee-deploy-maven-plugin)
-
-
-### API Proxy and Apigee configuration
-
-The folder [./apiproxy](./apiproxy) includes a simple API proxy bundle, a simple Apigee configuration file [./EdgeConfig/edge.json](./EdgeConfig/edge.json) as well as the following resources:
-
-- [GitHub Action Workflow File](.github/workflows/apigee-ci.yml) to define a GitHub Action CI
-  multi-branch pipeline.
-- [specs Folder](./specs) to hold the specification file for provided proxy.
-- [test Folder](./test) to hold the specification (owasp ruleset), unit and integration tests.
-
-## Target Audience
-
-- Operations
-- API Engineers
-- Security
-
-## Limitations & Requirements
-
-  - The authentication to the Apigee Edge management API is done using OAuth2. If you require MFA, please see the [documentation](https://github.com/apigee/apigee-deploy-maven-plugin#oauth-and-two-factor-authentication) for the Maven deploy plugin for how to configure MFA.
-  - The authentication to the Apigee X / Apigee hybrid management API is done using a GCP Service Account. See CI/CD Configuration [Instructions](https://gitlab.com/clalevee/apigee-simple-gitlab_ci-pipeline-v2#CI/CD-Configuration-Instructions).
-
-
-## CI/CD Configuration Instructions
-
-### Initialize a GitHub Repository
-
-Create a GitHub repository to hold your API Proxy. 
-
-To use the `Apigee-Simple-Github_CI-Pipeline`
-in your GitHub repository like `github.com/my-user/my-api-proxy-repo`, follow these
-steps:
-
-```bash
-git clone git@github.com:g-lalevee/Apigee-Simple-Github_CI-Pipeline.git
-cd Apigee-Simple-Github_CI-Pipeline
-git init
-git remote add origin git@github.com:my-user/my-api-proxy.git
-git checkout -b feature/cicd-pipeline
-git add .
-git commit -m "initial commit"
-git push -u origin feature/cicd-pipeline
-```
-
- 
-
-### GitHub Configuration 
-
-Add GitHub secrets `APIGEE_CREDS_USR` and `APIGEE_CREDS_PSW`, to store your Apigee User ID and password:
-- Go to your repository’s **Settings** > **Secrets**.
-- Click the **New Repository Secret** button.<BR>Fill in the details:
-  - Name: APIGEE_CREDS_USR
-  - Value: your Apigee user ID 
-  - Click the **Add secret** button
-- Click again the **New Repository Secret** button.<BR>Fill in the details:
-  - Name: APIGEE_CREDS_PSW
-  - Value: your Apigee user ID password
-  - Click the **Add secret** button
-
-## Run the pipeline
-
-Using your favorite IDE...
-1.  Update the **.github/workflows/apigee-ci.yml** file.<BR>
-In **"env"** section (workflow level), change `DEFAULT_APIGEE_ORG` value by your target Apigee organization.
-2.  Read carefully the **"Set Variables for [Main] branch"** step to check if the multibranch rules match your GitHub and Apigee environment naming and configuration.
-3. Save
-4. Commit, Push.. et voila!
-
-Use the GitHub UI to monitor your pipeline execution:
-
-- Go to your GitHub repository > **Actions** (tab). You can see your workflow running.
-
-![GitHub CICD Pipeline](img/GitHubUI-1.png)<BR>&nbsp;<BR>
-
-- Click on it to see execution detail. In list of jobs, click on **Apigee-Deploy**.
-
-![GitHub CICD Pipeline Animated](img/GitHubUI-2.png)<BR>&nbsp;<BR>
-
-- At the end of execution, you can download artifacts.<BR>Click on **Summary** link and scroll down to the **Artifacts** section.
-
-![GitHub CICD Pipeline artifacts](img/GitHubUI-3.png)<BR>&nbsp;<BR>
-
-- For example, download **apigeelint-report.zip** file and open html content with your browser. You can see the results of static code analysis for Apigee proxy with Apigeelint tool:
-
-![GitHub CICD Pipeline apickli](./img/GitHubUI-4.png)<BR>&nbsp;<BR>
+Understood. Below is a **real 15-minute, detailed, human-readable walkthrough** of the **entire 1-hour meeting** you gave. This is written so you can actually *feel* the meeting flow as if you attended it.
 
 ---
 
-### 1️⃣ “Use something that contains SYSGEN like SYSGEN123456789”
-
-**Reply:**
-
-> Updated all example MAL names to use the `SYSGEN123456789` style instead of simple numeric IDs.
-> For example, the main MAL folder is now shown as `mal-SYSGEN123456789/`, and the sample product is `SYSGEN123456789-my-product.yaml`.
+# Apigee OPDK → Apigee X Migration – Full Meeting Narrative (1-Hour Call)
 
 ---
 
-### 2️⃣ “Adding a new MAL – example MAL code (1234567)”
+## Opening Context
 
-**Reply:**
+The team is struggling with how to migrate **thousands of APIs** from legacy **Apigee OPDK** to **Apigee X** without breaking anything and without drowning in manual effort.
 
-> Adjusted the “Adding a new MAL” example to use a SYSGEN-style code.
-> The onboarding doc now shows:
->
-> * MAL folder: `mal-SYSGEN123456789/`
-> * Proxy: `SYSGEN123456789-my-api`
-> * Product: `SYSGEN123456789-my-product.yaml`.
+They are not just talking about moving proxies — they are re-thinking:
 
----
+• Product structures
+• OAuth token handling
+• CI/CD automation
+• Producer onboarding
+• Platform readiness
+• Environment cleanup
 
-### 3️⃣ “Only MALs that have changes is a little too broad”
-
-**Reply:**
-
-> Reworded this section to be more precise.
-> It now reads along the lines of:
-> *“Only MAL resources (proxies, products, KVMs, etc.) under MAL folders that changed in the PR are targeted by deployments (future optimisation – the current template just echoes what it would do).”*
+This is a *platform-level transformation* problem, not a coding task.
 
 ---
 
-### 4️⃣ “Prerequisites – not all API teams will have Products / API proxy must exist first”
+## Part 1 – Why the Current System is Broken
 
-**Reply:**
+They realize that OPDK has grown over **8+ years** without discipline:
 
-> Updated the onboarding prerequisites to separate the concepts:
->
-> * Clarified that **a MAL code and owning GitHub team** are required.
-> * Noted that having at least one **API proxy identified** is required before wiring products.
-> * Marked product creation as a step that “may not apply to all API producer teams.”
+• API products with **no credentials**
+• Test proxies people created “to play with”
+• Orphaned products not attached to any developer
+• Multiple copies of the same product across environments
+• No one knows which products are actually live
 
----
+They explicitly say:
 
-### 5️⃣ “At least one API proxy and product identified” (wording)
+> We should delete any API product that does not have a single credential assigned.
 
-**Reply:**
-
-> Tweaked the prerequisite text as suggested:
->
-> * It no longer assumes every team has a product on day one.
-> * It now says that teams must identify **at least one API proxy** and optionally any initial products they plan to use.
+Migration **cannot start** until OPDK is cleaned.
 
 ---
 
-### 6️⃣ “Emulate GitOps structure – products by org, etc.”
+## Part 2 – Four Parallel Worlds Exist
 
-**Reply:**
+They confirm there are effectively:
 
-> Clarified in the README that:
->
-> * This repo is **application/MAL-focused**, not the platform GitOps repo.
-> * Products are still org-level in Apigee, but in this repo they are grouped under `mal-<MAL_CODE>/products/` purely for **ownership and convenience**.
->   Also added a note that platform-level structure (org folders, sharedflows, etc.) stays in the enterprise GitOps repo.
+| Environment        |
+| ------------------ |
+| Internal – Prod    |
+| Internal – NonProd |
+| External – Prod    |
+| External – NonProd |
+
+Each one has:
+• Separate devs
+• Separate apps
+• Separate products
+
+But all share **the same names**, which makes replication impossible.
+
+They discuss renaming products to encode:
+
+* prod / nonprod
+* internal / external
+
+So replication can be deterministic.
 
 ---
 
-### 7️⃣ “Deploy workflows do nothing – add guidance on checking Actions / SYS GEN in name”
+## Part 3 – The Migration Tool is Mandatory
 
-**Reply:**
+They stop pretending documentation is enough.
 
-> Expanded the troubleshooting section for deploy workflows:
->
-> * Stated explicitly that in this template the deploy workflows **only echo what they would do**.
-> * Added guidance that, once real deployments are enabled, teams should verify runs via GitHub Actions and can filter by MAL/SYSGEN in the workflow or deployment name to find their runs.
+Reality check:
+• 3,000 APIs
+• 100+ teams
+• Each team will ask for help
+
+If they try to hand-hold everyone — the migration team collapses.
+
+So they propose a **Migration Extraction Tool**.
+
+### Tool will:
+
+• Read ESP / OPDK proxies
+• Read KVM values
+• Extract security model, throttles, timeouts
+• Generate YAML / CI seed config
+• Flag unsupported features
+• Auto-populate migration forms
+
+They say:
+
+> Would have been great if a tool could just extract what I saw and throw it into the form.
+
+This is the turning point of the call.
 
 ---
 
-### 8️⃣ “Looks amazing guys! See my comments.” (general wrap-up)
+## Part 4 – Mir / Mirror Owns the Producer Journey
 
-**Reply (top-level PR comment):**
+They clearly state:
 
-> Thanks for the detailed review and suggestions.
-> I’ve:
->
-> * Switched all examples to use `SYSGEN123456789`-style IDs.
-> * Clarified the MAL folder structure and env layout under each proxy.
-> * Tightened the wording around “only MALs that changed” to focus on MAL resources affected by the PR.
-> * Updated onboarding prerequisites around proxies vs. products.
-> * Documented the separation between this application/MAL repo and the platform GitOps repo.
-> * Expanded the troubleshooting text for deploy workflows as you suggested.
->   Please let me know if you’d like anything further refined.
+> If producers follow the steps **that Mir has delivered**, they should succeed.
+
+So Mir is responsible for:
+
+• Simulating migration manually
+• Discovering failure points
+• Improving CI/CD
+• Updating documentation
+• Turning chaos into a repeatable flow
+
+Mir is the **author of the migration playbook**.
+
+---
+
+## Part 5 – No Silent Fixing
+
+If anything breaks:
+
+> Do not quietly fix it.
+> Create a user story.
+
+This forces:
+• Traceability
+• Accountability
+• Shared ownership
+
+---
+
+## Part 6 – OAuth Token Replication (Critical Architecture)
+
+This is the hardest problem.
+
+### Phase 1 – Zero Impact
+
+OPDK forwards token request → Apigee X
+Apigee X:
+• Mints token
+• Stores token
+• Returns token to OPDK
+
+OPDK:
+• Stores token
+• Does NOT mint
+
+**Source of Truth = Apigee X**
+
+---
+
+### Phase 3 – Final State
+
+Apigee X forwards token request → OPDK
+OPDK:
+• Mints token
+• Stores token
+• Returns token to Apigee X
+
+**Source of Truth = OPDK**
+
+This avoids breaking any consumers during transition.
+
+---
+
+## Part 7 – Migration Timing
+
+They want to start migrating producer teams by:
+
+**End of February**
+
+But only if:
+
+• CI/CD works
+• Products exist
+• Developers exist
+• Apps exist
+• Token model works
+
+They refuse to move teams until the platform is truly ready.
+
+---
+
+## Part 8 – Production Readiness Checklist
+
+They introduce a new table that tracks:
+
+• Proxy templates complete
+• Error responses implemented
+• Shared flows validated
+• Utility proxies documented
+• Old PC31 stories removed
+• To-dos written
+
+They note many descriptions are **still empty**.
+
+---
+
+## Part 9 – Current Reality
+
+Liam just got working credentials.
+They are still validating OPDK access.
+
+They are **far** from mass migration.
+
+---
+
+## Final Outcome
+
+They are not building APIs.
+
+They are building a **migration factory**.
+
+A system where:
+• Producers self-migrate
+• Tools extract legacy config
+• Mir owns the playbook
+• OPDK is cleaned
+• Token flow is seamless
+• No platform team burnout
+
+---
+
+## About Copilot / AI
+
+There is:
+❌ No mention of Copilot
+❌ No criticism of AI
+❌ No negativity
+
+This meeting is 100% about **platform migration engineering**, not developer productivity tools.
+Understood. Below is a **real 15-minute, detailed, human-readable walkthrough** of the **entire 1-hour meeting** you gave. This is written so you can actually *feel* the meeting flow as if you attended it.
+
+---
+
+# Apigee OPDK → Apigee X Migration – Full Meeting Narrative (1-Hour Call)
+
+---
+
+## Opening Context
+
+The team is struggling with how to migrate **thousands of APIs** from legacy **Apigee OPDK** to **Apigee X** without breaking anything and without drowning in manual effort.
+
+They are not just talking about moving proxies — they are re-thinking:
+
+• Product structures
+• OAuth token handling
+• CI/CD automation
+• Producer onboarding
+• Platform readiness
+• Environment cleanup
+
+This is a *platform-level transformation* problem, not a coding task.
+
+---
+
+## Part 1 – Why the Current System is Broken
+
+They realize that OPDK has grown over **8+ years** without discipline:
+
+• API products with **no credentials**
+• Test proxies people created “to play with”
+• Orphaned products not attached to any developer
+• Multiple copies of the same product across environments
+• No one knows which products are actually live
+
+They explicitly say:
+
+> We should delete any API product that does not have a single credential assigned.
+
+Migration **cannot start** until OPDK is cleaned.
+
+---
+
+## Part 2 – Four Parallel Worlds Exist
+
+They confirm there are effectively:
+
+| Environment        |
+| ------------------ |
+| Internal – Prod    |
+| Internal – NonProd |
+| External – Prod    |
+| External – NonProd |
+
+Each one has:
+• Separate devs
+• Separate apps
+• Separate products
+
+But all share **the same names**, which makes replication impossible.
+
+They discuss renaming products to encode:
+
+* prod / nonprod
+* internal / external
+
+So replication can be deterministic.
+
+---
+
+## Part 3 – The Migration Tool is Mandatory
+
+They stop pretending documentation is enough.
+
+Reality check:
+• 3,000 APIs
+• 100+ teams
+• Each team will ask for help
+
+If they try to hand-hold everyone — the migration team collapses.
+
+So they propose a **Migration Extraction Tool**.
+
+### Tool will:
+
+• Read ESP / OPDK proxies
+• Read KVM values
+• Extract security model, throttles, timeouts
+• Generate YAML / CI seed config
+• Flag unsupported features
+• Auto-populate migration forms
+
+They say:
+
+> Would have been great if a tool could just extract what I saw and throw it into the form.
+
+This is the turning point of the call.
+
+---
+
+## Part 4 – Mir / Mirror Owns the Producer Journey
+
+They clearly state:
+
+> If producers follow the steps **that Mir has delivered**, they should succeed.
+
+So Mir is responsible for:
+
+• Simulating migration manually
+• Discovering failure points
+• Improving CI/CD
+• Updating documentation
+• Turning chaos into a repeatable flow
+
+Mir is the **author of the migration playbook**.
+
+---
+
+## Part 5 – No Silent Fixing
+
+If anything breaks:
+
+> Do not quietly fix it.
+> Create a user story.
+
+This forces:
+• Traceability
+• Accountability
+• Shared ownership
+
+---
+
+## Part 6 – OAuth Token Replication (Critical Architecture)
+
+This is the hardest problem.
+
+### Phase 1 – Zero Impact
+
+OPDK forwards token request → Apigee X
+Apigee X:
+• Mints token
+• Stores token
+• Returns token to OPDK
+
+OPDK:
+• Stores token
+• Does NOT mint
+
+**Source of Truth = Apigee X**
+
+---
+
+### Phase 3 – Final State
+
+Apigee X forwards token request → OPDK
+OPDK:
+• Mints token
+• Stores token
+• Returns token to Apigee X
+
+**Source of Truth = OPDK**
+
+This avoids breaking any consumers during transition.
+
+---
+
+## Part 7 – Migration Timing
+
+They want to start migrating producer teams by:
+
+**End of February**
+
+But only if:
+
+• CI/CD works
+• Products exist
+• Developers exist
+• Apps exist
+• Token model works
+
+They refuse to move teams until the platform is truly ready.
+
+---
+
+## Part 8 – Production Readiness Checklist
+
+They introduce a new table that tracks:
+
+• Proxy templates complete
+• Error responses implemented
+• Shared flows validated
+• Utility proxies documented
+• Old PC31 stories removed
+• To-dos written
+
+They note many descriptions are **still empty**.
+
+---
+
+## Part 9 – Current Reality
+
+Liam just got working credentials.
+They are still validating OPDK access.
+
+They are **far** from mass migration.
+
+---
+
+## Final Outcome
+
+They are not building APIs.
+
+They are building a **migration factory**.
+
+A system where:
+• Producers self-migrate
+• Tools extract legacy config
+• Mir owns the playbook
+• OPDK is cleaned
+• Token flow is seamless
+• No platform team burnout
+
+---
+
+## About Copilot / AI
+
+There is:
+❌ No mention of Copilot
+❌ No criticism of AI
+❌ No negativity
+
+This meeting is 100% about **platform migration engineering**, not developer productivity tools.
 
 
-### **🔍 Deployment Scope (Updated Per PR Review)**
-
-**Only MAL resources that changed will be targeted by deployments.**  
-Specifically, when a PR is merged, the workflow detects which  
-`mal-<SYSGEN_CODE>/` folders were modified and limits deployment to:
-
-- updated proxies  
-- updated API products  
-- updated KVMs  
-
-> *Note: In this starter repository, the deployment workflow currently only  
-> **echoes** what it would do. Actual deployment logic will be enabled later  
-> as part of the enterprise GitOps integration.*
-
-Hi all, I’ve pushed updates based on the PR feedback that was shared. Whenever you get a chance, please feel free to take a look and let me know if anything else is needed
-
-Hey Ryan, I’ve pushed updates to the Apigee X PR based on Jeremy’s comments. Jeremy is not available, so whenever you have some time, could you please take a look and let me know if anything else is needed?
-
-
-
-
-
-
-Hey Ryan! I’ve addressed the earlier comments and everything looks good from my end now. No issues with the PR on my side. I’ve also been updating the README and other repo docs. If there are any blockers on your side or anything you want me to take up next or adjust, just let me know.
+Today’s discussion helped clarify that our real goal is to build a repeatable producer migration factory, not just move individual proxies. The first steps are OPDK cleanup (remove orphan / unused API products), tightening environment clarity across internal/external and prod/non-prod, and refining CI/CD plus documentation so producers can self-serve. I will start by manually simulating migrations, capturing the exact steps required, and turning those into a clear producer guide. We also need a tool that can extract existing OPDK proxy configuration (endpoints, security, throttling, etc.) and generate seed YAML for Apigee X, highlighting unsupported features, so teams are not dependent on white-glove support. The most complex part remains the phased OAuth token replication strategy to ensure zero-impact cutover, with source-of-truth shifting between OPDK and Apigee X over time. We should only onboard producer teams once platform readiness, CI/CD, products, and production-readiness checklists are fully in place.
