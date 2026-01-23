@@ -1052,6 +1052,34 @@ If you want, paste just:
 
 …and I’ll rewrite the summary **with zero assumptions**, matching your actual command names, env vars, and output files.
 
+To close Phase 1 (discovery & architecture) for the API Proxy Discovery Tool and make sure we don’t make any wrong assumptions before moving to implementation, I just need confirmation on the points below:
+
+Environment mapping
+Can you confirm the exact mapping of ESP environments (dev1, test1–test4, prod) to OPDK organization + environment combinations (internal / external with test / prod)?
+
+OPDK Management API for bundles
+For extracting full proxy details (policies, targets, flows):
+
+Which OPDK Management APIs should we use to download proxy bundles?
+
+Can we assume the same Basic authentication used for KVM Admin APIs, with read-only credentials?
+
+KVM vs bundle scope
+Can we assume:
+
+KVMs contain only metadata/configuration (auth type, flags, ownership references), and
+
+All policy logic and target routing must be extracted from proxy bundles?
+
+ESP metadata automation
+Since ESP APIs appear browser-restricted, should we plan Phase 2 assuming ESP metadata (SYSGEN / ownership) is manual export or optional, unless the ESP team provides a supported REST API or service account?
+
+Sample proxies for validation
+Could you share 2–3 sample proxy names we can use for validation (one simple passthrough, one OAuth, one JWT), along with the OPDK org/env where they’re deployed?
+
+Sensitive data handling
+Besides secrets, passwords, and private keys, are there any additional attributes that must never be cached or written to disk when extracting KVM or bundle data?
+
 
 
 
