@@ -1082,4 +1082,19 @@ Besides secrets, passwords, and private keys, are there any additional attribute
 
 
 
+Environment mapping
+Can you confirm how ESP environments (dev1, test1–test4, prod) map to OPDK organization + environment (internal / external with test / prod)?
+
+OPDK Management API for bundles
+For extracting full proxy details (policies, targets, flows):
+
+Which OPDK Management APIs should be used to download proxy bundles?
+
+Can we assume Basic authentication (same as KVM Admin APIs) with read-only credentials?
+
+ESP automation expectation
+Since ESP APIs appear browser-restricted, should we plan Phase-2 assuming ESP metadata (SYSGEN / ownership) is manual or optional, unless the ESP team provides a supported REST API or service account?
+
+
+
 
