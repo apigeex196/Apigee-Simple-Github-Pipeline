@@ -1115,5 +1115,7 @@ Are there any proxies with non-standard configurations that we should avoid usin
 
 Once these are confirmed, Phase-1 will be fully closed on our side.
 
+For Phase-2 POC, should network access to OPDK be handled as an operational prerequisite, so the POC can focus on validating the extraction logic
+
 
 
