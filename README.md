@@ -1094,7 +1094,26 @@ Can we assume Basic authentication (same as KVM Admin APIs) with read-only crede
 
 ESP automation expectation
 Since ESP APIs appear browser-restricted, should we plan Phase-2 assuming ESP metadata (SYSGEN / ownership) is manual or optional, unless the ESP team provides a supported REST API or service account?
+===============================================================================================================
+To fully close Phase-1 per the Jira task, I just need confirmation on the remaining points below:
 
+Sample proxies for validation
+Could you please share 3 proxy names we can use for Phase-2 POC:
+
+one simple passthrough proxy
+
+one OAuth-based proxy
+
+one JWT-based proxy
+along with the OPDK org and environment where they are deployed?
+
+OPDK connectivity expectation
+For Phase-2 POC, can we assume the tool will run from an environment that already has network access to OPDK (VPN / jumpbox), with connectivity validation handled as part of the POC?
+
+Special proxy patterns
+Are there any proxies with non-standard configurations that we should avoid using as initial POC samples?
+
+Once these are confirmed, Phase-1 will be fully closed on our side.
 
 
 
