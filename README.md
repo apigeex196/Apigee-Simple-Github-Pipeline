@@ -1116,6 +1116,198 @@ Are there any proxies with non-standard configurations that we should avoid usin
 Once these are confirmed, Phase-1 will be fully closed on our side.
 
 For Phase-2 POC, should network access to OPDK be handled as an operational prerequisite, so the POC can focus on validating the extraction logic
+===============================================================================
+
+enterprise-apigeex-applications/docs/apigee-discovery/phase-1-discovery.md
+
+
+# Phase-1 Discovery & Architecture Decision  
+## API Proxy Discovery Tool (OPDK / ESP)
+
+**Status:** Phase-1 Complete  
+**Author:** Zahid Ali, Mir  
+**Date:** 2026-01-29  
+
+---
+
+## 1. Objective
+
+The goal of Phase-1 is to understand the current Apigee landscape (OPDK and ESP), identify the system of record for API proxy configurations, and decide the technical approach for building the API Proxy Discovery Tool.
+
+This phase focuses on research, validation, and architectural decisions. No production tooling is implemented in this phase.
+
+---
+
+## 2. Systems Overview
+
+### 2.1 Apigee OPDK
+
+Apigee OPDK hosts the actual API proxy runtime and configuration. It contains:
+
+- Proxy bundles (policies, flows, targets)
+- Environment-specific deployments
+- KVM definitions and references
+- Target endpoint and backend configurations
+
+OPDK exposes Apigee Management APIs that allow:
+- Listing APIs and revisions
+- Retrieving deployed revisions
+- Downloading proxy bundles (ZIP format)
+
+**Conclusion:** OPDK is the authoritative source of truth for proxy configuration.
+
+---
+
+### 2.2 ESP (Enterprise Service Portal)
+
+ESP provides enterprise-level API discovery and metadata. It includes:
+
+- API catalog and discovery
+- Ownership metadata (SYSGEN)
+- Routing and mediated resource information
+
+ESP does **not** store full proxy bundles (policies, flows, targets).  
+ESP APIs are currently browser-restricted and not exposed via supported service accounts.
+
+ESP is best suited for:
+- Proxy discovery and search
+- Ownership and SYSGEN mapping
+- Metadata correlation
+
+---
+
+## 3. Relationship Between ESP and OPDK
+
+| Aspect | ESP | OPDK |
+|------|-----|------|
+| Full proxy bundle | No | Yes |
+| Policies / flows | No | Yes |
+| Targets / backend URLs | No | Yes |
+| SYSGEN / ownership | Yes | No |
+| Source of truth | No | Yes |
+
+**Conclusion:**  
+ESP aggregates metadata and discovery information, while OPDK stores the actual proxy configuration and deployment details.
+
+---
+
+## 4. Architecture Decision
+
+### Selected Approach: Hybrid Model
+
+A hybrid approach is selected:
+
+- **ESP**
+  - Proxy discovery
+  - Ownership and SYSGEN mapping
+  - Search and filtering
+
+- **OPDK Management API**
+  - Retrieve proxy revisions
+  - Download proxy bundles
+  - Extract policies, flows, targets, and KVM references
+
+This approach aligns with ESP’s current limitations and OPDK’s authoritative role.
+
+---
+
+## 5. Environment Mapping (Confirmed)
+
+### Test Base URL
+api-test.test.intranet:8443
+
+- Environments: dev1, dev2, dev3, dev4, test1, test2, test3, test4  
+- Organizations: int, ext  
+- Requires non-production Apigee admin credentials  
+
+### Production Base URL
+api-prod.level3.com:8443
+
+- Environments: prod, test  
+- Organizations: int, ext  
+- Requires production Apigee admin credentials  
+- ESP sandbox maps test → ext only  
+
+---
+
+## 6. Sample Proxies Identified (for Phase-2 POC)
+
+Three representative proxies were identified using discovery results and a shared Python script.
+
+### Passthrough Proxy
+- **Name:** Esp_ExtMed_34S_v1_ntfwSrvImpPort_a3c78fe9-c486-4c27-a235-35347e3315d4  
+- **Type:** Passthrough  
+- **Auth:** None / Basic / OAuth  
+- **Org:** ext  
+- **Env:** prod  
+
+### OAuth Proxy
+- **Name:** Esp_ExtMed_Application_v1_SFDC_outboundSfaIntApexRest_44ce153e-e659-4409-8e33-eb9e7265a6ee  
+- **Type:** OAuth  
+- **Org:** ext  
+- **Env:** prod  
+
+### JWT Proxy
+- **Name:** Esp_ExtMed_Account_v1_billingAccount_c38d5957-97e9-4a89-b91a-f26649b0434e  
+- **Type:** JWT  
+- **Org:** ext  
+- **Env:** prod  
+
+These proxies represent simple, moderate, and more complex policy patterns.
+
+---
+
+## 7. OPDK Connectivity Expectations
+
+For Phase-2 POC, the following assumptions apply:
+
+- Tool execution will occur from an environment with OPDK network access (VPN / jumpbox)
+- Valid Apigee admin credentials (non-production) will be available
+- Connectivity validation will be performed during Phase-2
+
+Network access is treated as a prerequisite, not a Phase-1 blocker.
+
+---
+
+## 8. ESP Automation Constraints
+
+- ESP APIs are currently browser-restricted
+- No officially supported service account or REST API is available for automation
+- SYSGEN extraction may initially be manual or semi-automated using cached ESP responses
+
+ESP automation will be revisited in a later phase if supported APIs become available.
+
+---
+
+## 9. Phase-1 Outcome Summary
+
+- OPDK confirmed as the source of truth  
+- ESP confirmed as discovery and metadata layer  
+- Hybrid architecture selected  
+- Environment mappings documented  
+- Representative sample proxies identified  
+- Phase-2 scope clearly defined  
+
+**Phase-1 is complete.**
+
+---
+
+## 10. Next Steps (Phase-2 POC)
+
+- Build a minimal Python CLI  
+- Extract a single passthrough proxy from OPDK  
+- Generate a valid proxy.yaml  
+- Validate deployment via the Applications repo  
+- Avoid edge cases and batch processing initially  
+
+---
+
+## 11. Notes
+
+- Start with a happy-path, single proxy  
+- Gather platform team feedback early  
+- Treat this tool as a migration accelerator, not a fully automated migration solution  
+
 
 
 
