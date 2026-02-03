@@ -1310,4 +1310,18 @@ ESP automation will be revisited in a later phase if supported APIs become avail
 
 
 
+Hi Srinivasan,
+
+We’re working with the Apigee Platform team on a migration effort from Apigee OPDK to Apigee X. As part of a Phase-2 proof of concept, we’re checking whether there is a supported, read-only mediated API available that can return Apigee OPDK proxy endpoint metadata (proxy name, base path, environment, routing info).
+
+This would be used strictly for discovery and migration preparation — no create/update/delete actions required.
+
+Could you please let us know if:
+• such a read-only endpoint exists today
+• read-only/service credentials can be provisioned
+• there’s any documentation or guidance we should follow
+
+Thanks in advance for your guidance.
+
+
 
