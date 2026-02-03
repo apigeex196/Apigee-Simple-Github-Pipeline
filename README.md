@@ -1324,4 +1324,40 @@ Could you please let us know if:
 Thanks in advance for your guidance.
 
 
+Subject: Read-Only Access for Apigee OPDK Proxy Endpoint Discovery (Apigee X Migration POC)
+
+To: srinivasan.doppalapudi@lumen.com
+
+Cc: DL-EnterpriseApiSupport@lumen.com
+
+(optional: add Andre / Ryan if you want visibility)
+
+Email body:
+
+Hi Srinivasan,
+
+We are working with the Apigee Platform team on an Apigee OPDK → Apigee X migration effort. As part of a Phase-2 proof of concept, we are evaluating options to programmatically discover existing OPDK proxy endpoint metadata to support migration planning.
+
+We wanted to check whether there is a supported, read-only API (mediated resource or equivalent) that can provide information such as:
+
+Proxy name
+
+Base path / routing information
+
+Environment / organization context
+
+Endpoint-level metadata
+
+This access would be used strictly for discovery and migration preparation — no create, update, or delete actions are required.
+
+Could you please advise:
+
+Whether such a read-only endpoint exists today
+
+If read-only/service credentials can be provisioned for this purpose
+
+Any documentation or guidance we should follow
+
+Thanks in advance for your guidance. Please let us know if there’s a better contact or process for this request.
+
 
