@@ -1356,6 +1356,52 @@ Whether such a read-only endpoint exists today
 
 If read-only/service credentials can be provisioned for this purpose
 
+
+
+You are my senior engineer. You have access to this repo files. Goal: validate Srinivas OPDK proxy endpoints and document the exact API calls + outputs needed for Phase-2 POC (single proxy export to proxy.yaml).
+
+Context:
+- Srinivas said ESP internally calls these OPDK endpoints:
+  1) https://api-prod.level3.com:8443/v1/0/(targetServer)/apis/{proxyName}
+  2) https://api-prod.level3.com:8443/v1/0/(targetServer)/environments/{envName}/apis/{proxyName}
+- We already extracted sample proxies from ESP search results (Passthrough/OAuth/JWT). Use ONE passthrough proxy first.
+
+Task:
+1) Locate in the repo where we store sample proxies / results.json / phase-1 notes. Find at least 1 sample passthrough proxy name and its org/env (ext/int + prod/test). If multiple exist, pick the simplest passthrough one.
+2) Implement a small test runner script in this repo (preferably under tools/apigee-discovery/ or scripts/) that:
+   - Takes inputs via env vars:
+     OPDK_BASE_URL (default https://api-prod.level3.com:8443)
+     OPDK_TARGET_SERVER (value for (targetServer) path segment)
+     OPDK_ENV (envName)
+     OPDK_PROXY_NAME (proxyName)
+     OPDK_USER / OPDK_PASS (basic auth) OR OPDK_TOKEN (bearer) depending on existing repo conventions
+   - Calls both endpoints above and prints:
+     - HTTP status
+     - response headers (at least content-type)
+     - first ~500 chars of body
+     - saves full response JSON to /tmp or an output folder in repo (e.g., output/opdk_test/)
+   - Has safe error handling: prints useful message on 401/403/404 and includes URL called.
+3) Before coding, search the repo for any existing OPDK client or requests usage (requests library, curl wrappers, opdk_client.py, apigee client). Reuse existing patterns and dependencies. Do not invent new auth scheme if repo already has one.
+4) Add a README snippet (or comment block at top) showing exact commands to run:
+   - export OPDK_* vars
+   - python3 script command
+5) Run locally in terminal (or provide exact command lines) for:
+   - one known passthrough proxy (from sample list)
+   - env = prod OR non-prod depending on which base URL we can reach from our environment
+6) Output required for Phase-2:
+   - Confirm which endpoint returns what fields (proxy bundle metadata? deployments? basepath? targets? policies? KVM refs?)
+   - Note differences between /apis/{proxyName} vs /environments/{envName}/apis/{proxyName}
+   - Recommend which endpoint to use for Phase-2 extraction (or both).
+
+Acceptance:
+- I should have: (a) script file path + contents, (b) exact run command, (c) saved output JSON files, (d) short summary: which endpoint is sufficient and what’s missing.
+
+Important:
+- Keep it minimal (POC). No refactors. No big framework.
+- If the repo already contains a sample results.json with proxy names, use that.
+- If OPDK_TARGET_SERVER is unknown, search repo/docs for examples or how ESP constructs it; otherwise implement it as required input and explain how to set it.
+
+
 Any documentation or guidance we should follow
 
 Thanks in advance for your guidance. Please let us know if there’s a better contact or process for this request.
