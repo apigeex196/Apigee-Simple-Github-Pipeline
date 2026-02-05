@@ -1407,3 +1407,65 @@ Any documentation or guidance we should follow
 Thanks in advance for your guidance. Please let us know if there’s a better contact or process for this request.
 
 
+===================================================================================================================
+
+You are my VS Code Copilot. You have access to this repo and the Phase-1 doc + sample proxy name. Your job is to create a *Phase-2 OPDK endpoint test harness* so I can demo that we can pull proxy details from OPDK using Srinivas’ endpoints.
+
+GOAL (Phase-2 demo readiness):
+1) Call BOTH OPDK endpoints Srinivas gave, for ONE sample passthrough proxy.
+2) Save raw JSON responses to disk (timestamped) and print a clean console summary (status, key fields).
+3) Make it runnable in 1 command from terminal (Windows PowerShell friendly).
+
+ENDPOINTS TO TEST (from Srinivas email):
+A) https://api-prod.level3.com:8443/v1.0/{targetServer}/apis/{proxyName}
+B) https://api-prod.level3.com:8443/v1.0/{targetServer}/environments/{envName}/apis/{proxyName}
+
+Use these values for the demo run:
+- OPDK_BASE_URL = https://api-prod.level3.com:8443
+- OPDK_TARGET_SERVER = ext
+- OPDK_ENV_NAME = prod
+- OPDK_PROXY_NAME = Esp_ExtMed_34S_v1_ntfwfSrvcImpPort_a3c78fe9-c486-4c27-a235-35347e3315d4
+
+AUTH REQUIREMENT:
+Implement both auth options (choose automatically):
+- If env var OPDK_TOKEN exists => send header "Authorization: Bearer <token>"
+- Else if OPDK_USER and OPDK_PASS exist => use Basic Auth
+If neither exists, fail with a clear message.
+
+TLS/SSL:
+- Support env var OPDK_DISABLE_SSL_VERIFY=1 to disable SSL verification for POC (print a warning when used).
+- Otherwise use default verification.
+
+DELIVERABLES (create/modify files):
+1) scripts/opdk_probe.py
+   - Uses requests
+   - Calls both endpoints above
+   - Writes output files to: output/opdk_probe/<proxyName>/<timestamp>/
+     - apis.json  (response from endpoint A)
+     - env_apis.json (response from endpoint B)
+   - Prints console summary:
+     - URL called + HTTP status
+     - If JSON contains revisions/deployments/basePath/targets, print those keys safely (don’t assume they exist).
+     - Print first 300 chars if response is not JSON.
+   - Exit code non-zero on any failure.
+2) Update README.md (or create docs/opdk_phase2_probe.md) with exact run commands:
+   - Windows PowerShell example:
+     $env:OPDK_USER=""; $env:OPDK_PASS=""; python scripts/opdk_probe.py
+   - Linux/Mac bash example too.
+
+DEMO CHECKS (what to print so Phase-2 demo looks strong):
+- Show we can hit OPDK from our environment (connectivity)
+- Show both endpoints respond (200)
+- Show at least:
+  - proxy name
+  - org/targetServer used
+  - env name used
+  - list of revisions or deployed revision if present
+  - any basePath / virtualHost / target endpoint URL if present
+- If fields are missing, print “Not present in this response” (don’t crash).
+
+IMPORTANT:
+- Don’t add extra dependencies beyond requests (use existing venv/requirements if present; if missing, add minimal requirements.txt update).
+- Keep code production-clean (functions, error handling, timeouts).
+- Do NOT print secrets.
+- After implementing, show me exactly how to run it and what files will be generated.
