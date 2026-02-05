@@ -1500,3 +1500,18 @@ Good progress. Before Phase-2 demo, make these fixes/updates:
    Include OPDK_DISABLE_SSL_VERIFY=1 option.
 
 After changes, show me the final run commands + expected output files created.
+=====================================================================================================
+
+Hi Srinivas,
+
+Quick clarification before we proceed with the Phase-2 OPDK proxy export POC:
+
+For the OPDK endpoints below, should we authenticate using Bearer token or Basic authentication?
+
+What read-only role/permissions are required to access:
+
+/v1.0/{targetServer}/apis/{proxyName}
+
+/v1.0/{targetServer}/environments/{envName}/apis/{proxyName}
+
+This will help us use the correct and supported auth approach for the POC.
