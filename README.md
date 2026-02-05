@@ -1469,3 +1469,34 @@ IMPORTANT:
 - Keep code production-clean (functions, error handling, timeouts).
 - Do NOT print secrets.
 - After implementing, show me exactly how to run it and what files will be generated.
+=============================================================================================================
+
+
+Good progress. Before Phase-2 demo, make these fixes/updates:
+
+1) Confirm we are using Srinivas targetServer values ONLY: "int" or "ext". Update docs/examples to use OPDK_TARGET_SERVER="ext" (not esp-prod etc). Keep envName="prod".
+
+2) In scripts/opdk_probe.py, improve console summary (without assuming JSON keys exist):
+   - Print proxyName, targetServer, envName, status codes for both calls
+   - If JSON has keys like revisions, basepaths/virtualHosts, deployments/deployedRevision, targetEndpoints/backend URLs, print them safely
+   - If key missing, print "Not present".
+
+3) Make output folder deterministic:
+   output/opdk_probe/<proxyName>/<timestamp>/
+   - apis.json
+   - env_apis.json
+   - errors.txt (only if non-200 or non-JSON)
+
+4) Add timeout (ex: 20s) and consistent error handling. Never print secrets.
+
+5) Update docs/opdk_phase2_probe.md to include exact copy/paste commands for Windows PowerShell using this sample proxy:
+   OPDK_BASE_URL=https://api-prod.level3.com:8443
+   OPDK_TARGET_SERVER=ext
+   OPDK_ENV_NAME=prod
+   OPDK_PROXY_NAME=Esp_ExtMed_34S_v1_ntfwSrvImpPort_a3c78fe9-c486-4c27-a235-35347e3315d4
+   Show both auth modes:
+   - token via OPDK_TOKEN
+   - basic via OPDK_USER/OPDK_PASS
+   Include OPDK_DISABLE_SSL_VERIFY=1 option.
+
+After changes, show me the final run commands + expected output files created.
