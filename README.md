@@ -1535,6 +1535,73 @@ Typical token TTL and whether any scopes/audience need to be set
 Once I have this, I can run the probe against:
 /v1.0/{int|ext}/apis/{proxyName} and /v1.0/{int|ext}/environments/{env}/apis/{proxyName} for the Phase-2 demo.
 
+============================================================================================
+
+You have access to this repository and can execute scripts.
+
+Goal:
+Validate Phase-2 OPDK endpoints for a single passthrough proxy using **Basic Auth** (no OAuth token) and prepare outputs for a demo.
+
+Context:
+- OPDK endpoints confirmed by Srinivas:
+  1) /v1.0/{targetServer}/apis/{proxyName}
+  2) /v1.0/{targetServer}/environments/{envName}/apis/{proxyName}
+- targetServer values are **int** or **ext**
+- For Phase-2 POC we will start with:
+  - targetServer = ext
+  - envName = prod
+  - proxyName = Esp_ExtMed_34S_v1_ntfwfSrvcImpPort_a3c78fe9-c486-4c27-a235-35347e3315d4
+- Shimmy confirmed OPDK Management APIs work with **Basic Auth** (username/password), no bearer token needed.
+- Non-prod OPDK example uses direct management API access (curl -u user:pass).
+- This is a **read-only probe** for discovery, not a migration yet.
+
+Tasks:
+1. Update or confirm the existing script `scripts/opdk_probe.py` so that:
+   - Basic Auth is supported and preferred.
+   - OAuth/Bearer token is optional (do NOT require it).
+   - targetServer is validated as `int` or `ext`.
+   - Both endpoints (A and B) are called.
+   - Raw JSON responses are saved under:
+     output/opdk_probe/<proxyName>/<timestamp>/
+       - apis.json
+       - env_apis.json
+       - errors.txt (only if non-200 or non-JSON)
+
+2. Add a short README or doc update explaining:
+   - Required environment variables:
+     OPDK_BASE_URL
+     OPDK_TARGET_SERVER
+     OPDK_ENV_NAME
+     OPDK_PROXY_NAME
+     OPDK_USER / OPDK_PASS
+     OPDK_DISABLE_SSL_VERIFY (optional)
+   - Example PowerShell and bash commands to run the probe.
+
+3. Execute the probe locally using placeholder credentials (do NOT commit secrets):
+   - Show the exact curl-equivalent URLs being called.
+   - Print a clean summary to stdout:
+     - HTTP status for endpoint A and B
+     - Revisions (if present)
+     - Deployed revision (if present)
+     - Basepath
+     - Targets / backend URLs (best effort)
+
+4. Confirm whether the endpoints return enough data to:
+   - Identify proxy revisions
+   - Identify deployment context
+   - Proceed with generating `proxy.yaml` in Phase-2
+
+Output:
+- Confirm script execution results.
+- List any missing fields or blockers.
+- State clearly: “Phase-2 endpoint validation PASSED / FAILED” and why.
+
+Constraints:
+- Do NOT assume undocumented fields.
+- Do NOT require OAuth unless strictly necessary.
+- Keep this demo-ready and happy-path only.
+
+
 
 
 
