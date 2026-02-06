@@ -1515,3 +1515,26 @@ What read-only role/permissions are required to access:
 /v1.0/{targetServer}/environments/{envName}/apis/{proxyName}
 
 This will help us use the correct and supported auth approach for the POC.
+
+========================================================================================
+
+Hi Andre,
+
+Srinivas confirmed Bearer token auth for OPDK.
+
+I’m guessing the token is generated via an internal script/CLI — can you confirm:
+
+Which script/tool generates the OPDK Bearer token (repo/path)?
+
+Exact command to run (PowerShell/Bash) and required env vars/inputs
+
+Does it use SSO or a service account?
+
+Typical token TTL and whether any scopes/audience need to be set
+
+Once I have this, I can run the probe against:
+/v1.0/{int|ext}/apis/{proxyName} and /v1.0/{int|ext}/environments/{env}/apis/{proxyName} for the Phase-2 demo.
+
+
+
+
