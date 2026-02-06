@@ -1607,6 +1607,76 @@ Constraints:
 you should contact srinivas.doppalapudi@lumen.com
  or DL-EnterpriseApiSupport@lumen.com
  and ask if they are able to provide you a Read Only credential to ESP API (mediationResource endpoints) to retrieve Apigee OPDK API proxy endpoints info.
+
+ =======================================================================
+
+ You have access to my repo and can run scripts.
+
+Context:
+- The ESP-provided endpoints on port 8443 are NOT standard OPDK management APIs.
+- Shimmy confirmed the supported and scriptable interface is the OPDK Management API on port 8080 using Basic Auth.
+- Phase-2 goal is to validate OPDK endpoints and extract enough metadata to proceed with Apigee X migration (single proxy export to proxy.yaml).
+
+Task:
+1. Update the existing Phase-2 probe script to STOP using ESP endpoints:
+   - Remove usage of:
+     /v1.0/{targetServer}/apis/{proxyName}
+     /v1.0/{targetServer}/environments/{envName}/apis/{proxyName}
+
+2. Switch to OPDK Management API endpoints (port 8080):
+   - GET /v1/organizations/{org}/apis/{proxyName}
+   - GET /v1/organizations/{org}/environments/{envName}/apis/{proxyName}
+
+3. Authentication:
+   - Use Basic Auth ONLY (username/password)
+   - Do NOT use bearer tokens
+   - Read credentials from env vars:
+     OPDK_USER
+     OPDK_PASS
+
+4. Configuration:
+   - Base URL example: http://4.72.75.223:8080
+   - Env vars to support:
+     OPDK_BASE_URL
+     OPDK_ORG
+     OPDK_ENV
+     OPDK_PROXY_NAME
+
+5. Script behavior:
+   - Call both endpoints above
+   - Save raw JSON responses to:
+     output/opdk_probe/<proxyName>/<timestamp>/apis.json
+     output/opdk_probe/<proxyName>/<timestamp>/env_apis.json
+   - Print a clean console summary including:
+     - proxy name
+     - revisions
+     - deployed revision
+     - basePath
+     - virtualHosts
+     - targets / backend URLs (best-effort)
+   - Fail with clear error if:
+     - auth fails (401/403)
+     - proxy not found (404)
+     - non-JSON response
+
+6. Cleanup:
+   - Remove all references to:
+     targetServer
+     ESP
+     port 8443
+     OAuth / bearer tokens
+   - Update any README/docs to state:
+     “Phase-2 uses OPDK Management API (port 8080, Basic Auth) as the source of truth.”
+
+7. After changes:
+   - Run a sanity test against one known proxy
+   - Report:
+     - HTTP status of both calls
+     - Which required fields are present/missing
+     - Whether Phase-2 demo readiness is achieved
+
+Make the changes directly in the code and explain briefly what was changed and why.
+
  
 
 
