@@ -1602,6 +1602,11 @@ Constraints:
 - Keep this demo-ready and happy-path only.
 
 
+==================================
 
+you should contact srinivas.doppalapudi@lumen.com
+ or DL-EnterpriseApiSupport@lumen.com
+ and ask if they are able to provide you a Read Only credential to ESP API (mediationResource endpoints) to retrieve Apigee OPDK API proxy endpoints info.
+ 
 
 
