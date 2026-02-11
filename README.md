@@ -1677,6 +1677,88 @@ Task:
 
 Make the changes directly in the code and explain briefly what was changed and why.
 
- 
+ ================================
+
+
+ We are implementing Phase 2 (POC) of the Apigee OPDK → Apigee X Migration Discovery Tool.
+
+Goal:
+Build a minimal working CLI tool in Python that extracts ONE proxy using the internal API Hub (ESP) endpoint and generates a schema-valid proxy.yaml file for deployment in the enterprise-apigeex-applications repo.
+
+IMPORTANT:
+This is Phase 2 POC only.
+Do NOT implement deep OPDK bundle parsing yet.
+Do NOT implement policy-level extraction.
+Do NOT implement batch mode yet.
+Focus only on:
+- Single proxy extraction
+- Schema-valid proxy.yaml
+- Deployment-ready folder output
+
+Source of data:
+Internal API Hub endpoint (ESP):
+GET /Enterprise/v1/SOAEnablement/apiHub/v1/apiProxyDetails?env=<env>&offset=0&limit=20&sort=+resourceTaxonomy
+
+Authentication:
+Check existing codebase and internal docs for:
+- JWT (Bearer) usage OR
+- Basic auth
+Use whichever is already used in other internal automation scripts.
+If corporate CA bundle is required, support:
+--ca-bundle
+and --insecure for dev only.
+
+Tasks:
+
+1) Locate apiproxy.schema.json in:
+enterprise-apigeex-applications repo
+
+2) Identify minimum required fields in schema.
+
+3) Create CLI:
+tools/apigee-discovery/discover.py
+
+Usage:
+./discover.py extract --proxy <name> --env <env> --output <path>
+
+4) Implementation Steps:
+
+- Call API Hub endpoint
+- Filter response for requested proxy name
+- Extract:
+  - proxy name
+  - description (if present)
+  - basePath
+  - virtual host (if present)
+  - target/backend URL or target server name
+- Map fields into proxy.yaml structure that satisfies apiproxy.schema.json
+- Validate against schema using jsonschema
+- Write:
+  - proxy.yaml
+  - migration_notes.md (minimal placeholder allowed)
+
+5) Output folder must match expected structure of enterprise-apigeex-applications repo for proxies.
+
+6) Fail clearly if:
+  - Proxy not found
+  - Schema validation fails
+  - Authentication fails
+
+7) Add clear console logs.
+
+Do not assume fields.
+Inspect real API response structure before mapping.
+Use defensive parsing.
+
+Deliver:
+- Complete discover.py
+- requirements.txt
+- Example usage comment
+- Minimal README snippet for POC
+
+
+
+
+
 
 
