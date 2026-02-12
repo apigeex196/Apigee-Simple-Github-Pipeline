@@ -1933,6 +1933,111 @@ Deliverables:
 
 
 
+=====================================================
+
+You have full access to this repository.
+
+We are preparing for a critical architecture review. We need to tighten and standardize product deployment filtering and remove any remaining schema inconsistencies in docs.
+
+Perform the following EXACT tasks. Do not guess. Use only existing repo patterns.
+
+------------------------------------------------------------
+TASK 1 — Tighten product filtering regex in deploy-products.yml
+------------------------------------------------------------
+
+File: .github/workflows/deploy-products.yml
+
+Currently the PRODUCT_FILES filter uses a loose regex:
+  mal-SYSGEN.*/orgs/.*/products/.*\.yaml$
+
+Replace it with a strict, anchored regex that matches exactly:
+  mal-SYSGEN[0-9]{9}/orgs/<org>/products/*.yaml
+
+Implementation requirements:
+- Anchor regex with ^ and $
+- Ensure <org> matches a single directory segment (no nested folders)
+- Keep .yaml extension only
+- Do NOT modify unrelated workflow logic
+
+Use this pattern:
+
+  ^mal-SYSGEN[0-9]{9}/orgs/[^/]+/products/.*\.yaml$
+
+Update the filtering block only.
+Show the exact diff.
+
+------------------------------------------------------------
+TASK 2 — Ensure validate-product.yml uses the SAME canonical location
+------------------------------------------------------------
+
+File: .github/workflows/validate-product.yml
+
+Confirm that:
+- on.pull_request.paths matches:
+    mal-SYSGEN*/orgs/*/products/*.yaml
+- The internal filtering regex matches the same strict format used in deploy-products.yml
+
+If it does not, update it to use the same strict anchored regex:
+  ^mal-SYSGEN[0-9]{9}/orgs/[^/]+/products/.*\.yaml$
+
+Do not change unrelated validation logic.
+Show the exact diff.
+
+------------------------------------------------------------
+TASK 3 — Remove leftover non-schema terminology from docs
+------------------------------------------------------------
+
+File: docs/api-producer-core.md
+
+Search for the following terms:
+- basepath
+- targetAudience
+
+Replace:
+- basepath → spec.routing.path
+- Remove or correct targetAudience if it does not exist in apiproxy.schema.json
+
+Ensure all YAML examples match:
+- apiVersion: apienable.lumen.com/v1beta1
+- spec.template
+- spec.routing
+
+Do NOT rewrite the entire document.
+Only fix inconsistent terminology.
+Show the exact diff.
+
+------------------------------------------------------------
+TASK 4 — Ensure documentation matches canonical product location
+------------------------------------------------------------
+
+In docs/api-producer-core.md:
+
+Confirm that product YAML location is documented as:
+  mal-<SYSGEN>/orgs/<org>/products/<product>.yaml
+
+Remove any references to:
+  global/products
+
+Show diff if changes were needed.
+
+------------------------------------------------------------
+OUTPUT REQUIREMENTS
+------------------------------------------------------------
+
+1. Show unified diffs for:
+   - deploy-products.yml
+   - validate-product.yml
+   - docs/api-producer-core.md
+2. List:
+   Files changed:
+   - <path>
+   - <path>
+
+Do NOT invent template names.
+Do NOT modify schema files.
+Only perform the tasks above.
+
+Begin.
 
 
 
