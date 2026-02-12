@@ -1831,6 +1831,64 @@ Deliverable:
 - Provide the final updated api-producer-core.md content.
 - At the end, list every file you modified (with paths).
 
+============================================================
+
+You are Copilot with full access to this repository.
+
+Goal: I have a critical review call tomorrow. I need repo-accurate answers (with evidence) to these questions:
+1) What breaks most often for API Producers?
+2) What validation failures do producers hit?
+3) How do shared flows get ensured in each environment?
+4) How does rollback behave?
+5) How does template mismatch surface?
+6) What if product quota conflicts?
+7) What if OAS file is missing?
+8) What if service account is missing?
+
+IMPORTANT RULES:
+- Do NOT guess. Only answer using evidence from this repo (workflows, scripts, schemas, docs, action logs examples).
+- For each question, provide:
+  a) “What happens” (behavior)
+  b) “Where enforced” (exact file paths)
+  c) “How producer sees it” (PR check name / error message patterns)
+  d) “How to fix” (exact steps)
+  e) “Example” (show a representative snippet found in repo: workflow step, script, doc excerpt, schema constraint)
+- If you cannot find evidence for an item, write: “NOT FOUND IN REPO” and list what file/tool would need to exist.
+
+TASKS:
+A) Search these areas first:
+- .github/workflows/
+- workflows/ (docs folder referenced by api-producer-core guide)
+- docs/ and planning/
+- apiproxy.schema.json, apiproduct.schema.json
+- template-mappings.json
+- any scripts referenced by workflows (bash/python/node)
+- OAS validation docs/scripts (search for redocly/openapi-cli, oasValidation, oasResource)
+- rollback/undeploy docs (search for rollback, undeploy, redeploy, revert, cleanup)
+
+B) Produce a markdown report named:
+docs/API-PRODUCER-FAILURE-MODES.md
+
+Structure the report exactly like this:
+- Title + date
+- Executive summary (5 bullets)
+- A table: Failure Mode | Symptom | Where enforced (file path) | Fix
+- Then 8 sections, one per question, with the a-e format above.
+- End with: “Files referenced” list (paths only)
+
+C) Also update api-producer-core.md with links to this new report:
+- Add a short “Common failure modes” link in Section 2 and Section 3.
+- Do not remove existing content.
+
+DELIVERABLE:
+1) Create/modify the files:
+- docs/API-PRODUCER-FAILURE-MODES.md
+- api-producer-core.md (add links only)
+2) Output a final list: “Files changed:” with exact paths.
+
+Now begin by scanning the repo and collecting evidence, then generate the report and apply doc link updates.
+
+
 
 
 
