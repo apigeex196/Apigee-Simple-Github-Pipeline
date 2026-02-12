@@ -1888,6 +1888,48 @@ DELIVERABLE:
 
 Now begin by scanning the repo and collecting evidence, then generate the report and apply doc link updates.
 
+===================================================================================================================
+
+You have full access to this repository.
+
+Goal: Make the API Producer documentation and failure-mode references consistent with the ACTUAL repo schemas, MAL examples, and workflow triggers. No guessing.
+
+Tasks (do in order):
+
+1) Update docs/api-producer-core.md:
+   - All YAML examples MUST validate against apiproxy.schema.json and apiproduct.schema.json in this repo.
+   - Use the existing repo examples as the base reference:
+     - mal-SYSGEN788836350/.../proxies/E2E-TEST-BASIC/proxy.yaml
+     - mal-SYSGEN788836350/.../products/SYSGEN788836350-E2E-TEST-PRODUCT.yaml
+   - Remove/replace any fields not in schema (e.g., spec.bundle, deployment, serviceAccountEmail, basepath if they do not exist in schema).
+   - Ensure apiVersion matches the enum in apiproxy.schema.json.
+   - Document the correct product YAML location and match it to workflow triggers (see below).
+
+2) Fix docs/API-PRODUCER-FAILURE-MODES.md links:
+   - This file is under docs/, so links to .github/workflows/* MUST be updated to ../.github/workflows/*
+   - Preserve the line anchors (#Lx-Ly).
+
+3) Resolve product YAML path inconsistency:
+   - Inspect workflow triggers:
+     - .github/workflows/validate-product.yml
+     - .github/workflows/deploy-products.yml
+   - Inspect where product YAMLs actually exist (mal-*/orgs/*/products/*.yaml).
+   - Choose ONE canonical location:
+     A) Update workflow path filters to match the existing orgs/<org>/products location, OR
+     B) Move/duplicate product YAMLs to the workflow-expected location and update docs.
+   - Implement the chosen approach and explain it in docs/api-producer-core.md in one short paragraph.
+
+4) Add a short “Shared Flows” clarification section in docs/api-producer-core.md:
+   - Explain how shared flows are used (through templates/FlowCallout policies).
+   - If the workflows do NOT validate shared-flow existence, state that clearly and provide expected failure symptom and what producers should do.
+
+Deliverables:
+- Provide final diffs for:
+  - docs/api-producer-core.md
+  - docs/API-PRODUCER-FAILURE-MODES.md
+  - any workflow(s) you change
+- At the end output: “Files changed:” with exact paths.
+- Do not invent template names; read template-mappings.json and use real values.
 
 
 
