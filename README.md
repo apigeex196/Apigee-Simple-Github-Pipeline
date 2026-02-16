@@ -2041,4 +2041,57 @@ Begin.
 
 
 
+You are my coding assistant. Goal: finish Jira “[TOOL] API Proxy Discovery Tool - Pull Proxy Details from OPDK or ESP” using the ESP mediatedResource API.
+
+Context:
+- We can successfully call: /Enterprise/v1/Routing/mediatedResource using appkey auth.
+- We already have a working script: proxydetails-example.py that iterates environments (test1, sandbox, mock) and saves JSON outputs:
+  - mediated-resource-response_test1.json
+  - mediated-resource-response_sandbox.json
+  - mediated-resource-response_mock.json
+- The call goes through Apigee proxy (api.corp.intranet / api-test1.test.intranet) with cert chains (NONPROD/PROD).
+
+What I need you to do in this repo:
+1) Locate proxydetails-example.py and run it locally.
+   - Add a README section with the exact run command and required env vars.
+2) Open and inspect one saved JSON file (test1) and identify which fields map to the required YAML fields:
+   - proxy name/description
+   - basePath/virtual host
+   - target endpoints/backend URLs
+   - environment-specific config/custom properties
+   - any policy/pattern hints (oauth/jwt/cors/ratelimit) if present
+   - any KVM references if present
+3) Implement a new CLI tool in: api-enablement-toolkit/tools/apigee-discovery/
+   - discover.py (argparse)
+   - commands:
+     a) extract --env <env> --proxy <proxyNameOrId> --out <dir>
+     b) extract --env <env> --out <dir> (dump all in env)
+     c) extract --env <env> --batch <file> --out-dir <dir> (nice-to-have)
+   - It should call ESP API (reuse code from proxydetails-example.py) and filter to one proxy for single extraction.
+4) Generate these outputs in the output directory:
+   - proxy.yaml (must validate against apiproxy.schema.json)
+   - migration_notes.md (manual steps / gaps)
+   - kvm_requirements.txt (best-effort; if not in JSON, write “not found in ESP response”)
+   - template_recommendation.txt (best-effort based on detected fields; otherwise “unknown”)
+5) Add JSON schema validation:
+   - Find apiproxy.schema.json in enterprise-apigeex-applications (or repo path).
+   - Validate generated proxy.yaml using jsonschema after converting YAML->dict.
+   - If schema file path is missing, add a CLI flag --schema <path>.
+6) Provide clear errors:
+   - If proxy not found in JSON, print list of close matches.
+   - If auth fails, print where to set appkey/token.
+   - If environment invalid, print supported values.
+
+Deliverables:
+- Code changes + updated requirements.txt (requests, PyYAML or ruamel.yaml, jsonschema)
+- README.md with install + examples
+- Example run commands for single proxy and batch mode
+- Ensure it runs on Python 3.9+
+
+Please implement with production-quality structure:
+- extractors/esp_client.py
+- generators/yaml_generator.py
+- validators/schema_validator.py
+- analyzers/template_matcher.py
+- analyzers/policy_analyzer.py (only if ESP JSON has useful signals)
 
