@@ -2095,3 +2095,80 @@ Please implement with production-quality structure:
 - analyzers/template_matcher.py
 - analyzers/policy_analyzer.py (only if ESP JSON has useful signals)
 
+
+
+
+====================================
+
+
+You are helping me fix my Apigee Proxy Discovery Tool.
+
+Problem:
+My generated proxy.yaml contains placeholder values:
+
+- metadata.name = "unknown-proxy"
+- routing.target = "https://UNKNOWN-TARGET"
+- routing.path = "/"
+- security.target.type = "apht"
+
+This means the ESP JSON fields are not being mapped correctly.
+
+Your task:
+
+1) Open one of these files:
+   - mediated-resource-response_test1.json
+
+2) Inspect ONE single proxy record and identify:
+   - Actual proxy name field
+   - BasePath or routing path field
+   - Target/backend URL field
+   - Any security-related indicators
+   - Any environment-specific properties
+
+3) Update yaml_generator.py so that:
+
+   metadata.name = <real proxy name from JSON>
+
+   routing.path = <real basePath from JSON>
+
+   routing.target = <real backend URL from JSON>
+
+   security.proxy.type = inferred from JSON
+     - if OAuth-related fields exist → oauth
+     - if JWT-related fields exist → jwt
+     - otherwise → none
+
+   security.target.type = http (unless JSON explicitly says otherwise)
+
+4) Remove ALL placeholder defaults like:
+   - "unknown-proxy"
+   - "UNKNOWN-TARGET"
+   - hardcoded "/"
+   - "apht"
+
+5) Add fallback behavior:
+   If required fields are missing in JSON:
+     - raise a clear error
+     - OR write warning into migration_notes.md
+
+6) Print debug log:
+   - Print which JSON fields are being mapped
+   - Print if any critical fields are missing
+
+7) After implementing mapping:
+   - Regenerate proxy.yaml
+   - Validate against apiproxy.schema.json
+   - Ensure no UNKNOWN values remain
+
+Goal:
+Generated proxy.yaml must reflect real proxy configuration from ESP JSON.
+It must be deployable without manual editing.
+
+Do not use assumptions.
+Use only real fields found in JSON.
+
+Show me:
+- Which JSON fields were mapped
+- Updated yaml_generator.py changes
+
+
