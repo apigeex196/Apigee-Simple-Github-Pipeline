@@ -1,0 +1,147 @@
+You have full access to this repository.
+
+We need to update docs/api-producer-core.md to incorporate recent onboarding clarity feedback without changing architecture, schema references, or workflow logic.
+
+Only improve documentation clarity and producer onboarding usability.
+
+Do NOT rewrite the entire document.
+Do NOT modify schema files.
+Do NOT change workflow references.
+Only insert and refine documentation sections as described below.
+
+TASK 1 — Improve Section 1: Access & Provisioning Clarity
+
+Under Section 1: Getting Started, after the "Prerequisites" bullet list, add a new subsection:
+
+Requesting Access & Provisioning
+
+This subsection must include:
+
+How to request GitHub repo access:
+
+Reference internal group or access request process (leave placeholders like <GitHub Group> if unknown).
+
+How to obtain a MAL code:
+
+State that MAL codes are assigned by platform governance and provide placeholder <Submit Jira ticket to Platform Team>.
+
+How service accounts are provisioned:
+
+Clarify that service accounts are created per MAL per environment.
+
+Indicate expected IAM permissions required (Apigee deploy, Secret Manager access, etc.).
+
+Escalation path:
+
+“If access is not provisioned within X business days, contact <Platform Contact>.”
+
+Keep it professional and concise.
+
+TASK 2 — Add Concrete Repo Structure Example Early
+
+In Section 1 where repo structure is introduced (the abstract path pattern):
+
+Add an explicit example block immediately after the abstract structure:
+
+Example (DEV environment):
+
+mal-SYSGEN788836350/
+orgs/gcp-prj-apigee-dev-np-01/
+envs/apicc-dev/
+proxies/SYSGEN788836350-my-api/
+proxy.yaml
+
+Do NOT remove the generic path template — just add the example below it.
+
+TASK 3 — Clarify OAS File Placement Wording
+
+In Section 2 under Template & OAS, replace any wording like:
+“include your OAS file next to the proxy YAML”
+or
+“alongside your proxy YAML”
+
+With:
+
+“Place your OAS file in the same directory as your proxy.yaml file.”
+
+Then add a small folder example:
+
+proxies/SYSGEN788836350-my-api/
+proxy.yaml
+your-openapi.yaml
+
+Keep OAS schema references intact.
+
+TASK 4 — Improve API Product Customization Guidance
+
+In Section 3 (API Products), before the minimal product YAML example, insert:
+
+When Should I Create a Custom Product?
+
+Explain clearly:
+
+A default product is created automatically per proxy.
+
+Create a custom product if you need:
+
+Manual approval
+
+Custom quotas
+
+Scope control
+
+Multiple proxies under one product
+
+Fine-grained operation-level access
+
+Then add:
+
+Safe vs Platform-Controlled Fields
+
+Safe to modify:
+
+spec.quota
+
+spec.scopes
+
+spec.approval
+
+spec.access
+
+spec.proxies
+
+spec.attributes
+
+Do NOT modify:
+
+apiVersion
+
+kind
+
+internal metadata keys
+
+sysgen value
+
+enforced naming patterns
+
+Then add a simple explanation of quota fields:
+
+limit = number of requests
+interval = reset frequency
+timeUnit = minute/hour/day
+
+Keep it concise and producer-friendly.
+
+OUTPUT REQUIREMENTS
+
+Show a unified diff of changes to docs/api-producer-core.md.
+
+Do not modify other files.
+
+Preserve all existing schema references and links.
+
+Do not change template names or workflow references.
+
+Keep formatting consistent with the rest of the document.
+
+Begin.
