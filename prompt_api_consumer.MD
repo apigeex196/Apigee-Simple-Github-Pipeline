@@ -355,6 +355,7 @@ Begin full structural rewrite.
 
 ========================
 
-grep -R "mal-" .
-grep -R "orgs/" .
-grep -R "envs/" .
+Select-String -Path * -Pattern "mal-" -Recurse
+Select-String -Path * -Pattern "orgs/" -Recurse
+Select-String -Path * -Pattern "envs/" -Recurse
+Select-String -Path * -Pattern "base.yaml" -Recurse
