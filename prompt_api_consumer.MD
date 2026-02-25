@@ -351,3 +351,10 @@ Output a unified diff for docs/api-producer-core.md.
 Before finishing, scan the entire rewritten file and confirm none of the banned strings exist.
 
 Begin full structural rewrite.
+
+
+========================
+
+grep -R "mal-" .
+grep -R "orgs/" .
+grep -R "envs/" .
