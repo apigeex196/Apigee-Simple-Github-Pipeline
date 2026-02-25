@@ -359,3 +359,6 @@ Select-String -Path * -Pattern "mal-" -Recurse
 Select-String -Path * -Pattern "orgs/" -Recurse
 Select-String -Path * -Pattern "envs/" -Recurse
 Select-String -Path * -Pattern "base.yaml" -Recurse
+
+
+Get-ChildItem -Recurse -File | Select-String "mal-"
