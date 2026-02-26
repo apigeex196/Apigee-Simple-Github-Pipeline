@@ -1,50 +1,84 @@
+You have access to this repository.
 
-You have access to this repository. I need you to apply Shimmy’s PR feedback:
+Your task is to audit the entire codebase and confirm whether Shimmy’s concern has been fully resolved:
 
-Remove the workflow changes that make Service Account (SA) retrieval non-blocking (e.g., continue-on-error: true and any conditional skip). Validation must mirror deployment requirements: if PR validation passes, deployment should succeed.
+> PR validation must fail if Service Account (SA) retrieval fails. There must be no soft-fail, bypass, or conditional skip that allows PR validation to pass without a valid SA. Validation behavior must mirror deployment requirements.
 
-Scope rules
+Do NOT modify any files.
+This is an audit only.
 
-You MAY edit GitHub workflow files under .github/workflows/ only to remove the SA bypass behavior.
+------------------------------------------------------------
+STEP 1 — Scan All Workflows
+------------------------------------------------------------
 
-Do NOT change any schema files, templates, or other logic.
+Search all files under:
 
-Do NOT change documentation files except to remove statements that depend on the SA-bypass behavior (if any).
+.github/workflows/
 
-Keep all documentation and demo script improvements otherwise intact.
+Look for:
 
-Tasks
+- continue-on-error
+- || true
+- set +e
+- sa-available
+- limited mode
+- any "if:" condition that skips SA retrieval
+- any step referencing service account retrieval
 
-Search all .github/workflows/*.yml and .github/workflows/*.yaml for:
+For each match, output:
 
-continue-on-error
+- File name
+- Line number
+- Exact code snippet
+- Whether it creates a bypass risk (YES/NO + explanation)
 
-if: conditions that skip SA checks
+------------------------------------------------------------
+STEP 2 — Inspect SA Retrieval Action
+------------------------------------------------------------
 
-steps/actions/scripts that retrieve SA and currently tolerate failures
+Open:
 
-For every SA retrieval/validation step:
+.github/actions/get-service-account/action.yml
 
-Remove continue-on-error: true
+Check:
 
-Remove conditional if: that skips SA retrieval/validation
+1. Does it exit non-zero if token retrieval fails?
+2. Does it use "set -e"?
+3. Does it swallow errors?
+4. Does it echo error but still exit 0?
+5. Could it produce an empty token but still succeed?
 
-Ensure the step fails the job when SA is missing/invalid (fail-fast)
+Clearly explain whether the action is fail-fast.
 
-Ensure PR validation workflows and deploy workflows behave consistently:
+------------------------------------------------------------
+STEP 3 — Compare Validation vs Deployment
+------------------------------------------------------------
 
-PR validation must fail if SA is not configured
+Check:
 
-Deployment should still require SA (no relaxation)
+- validate-proxy workflow
+- validate-product workflow
+- all deploy workflows
 
-Verify that the demo path remains possible using SYSGEN788836350_APIGEE-CC (do not hardcode it in workflow; just ensure docs recommend it for demos).
+Confirm:
 
-Output requirements
+- If SA retrieval fails in validation, does the job stop?
+- If SA retrieval fails in deployment, does the job stop?
 
-Provide a unified diff of ALL changed files.
+Explicitly state whether validation and deployment enforce the same requirement.
 
-Also list which workflows were changed and which lines/steps were responsible for SA validation.
+------------------------------------------------------------
+STEP 4 — Final Verdict
+------------------------------------------------------------
 
-Confirm in one paragraph: “PR validation will now fail if SA is missing, preventing merge-time deployment failures.”
+Output:
 
-Begin.
+1. Whether Shimmy’s concern is fully resolved (YES / NO).
+2. If NO, list exact file + line where bypass still exists.
+3. If YES, explain why the workflow is now fail-fast and consistent.
+4. Confirm whether any “false green PR” scenario still exists.
+
+Do not assume anything.
+Only base conclusions on actual code in the repository.
+
+Begin full audit now.
