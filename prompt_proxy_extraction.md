@@ -108,3 +108,87 @@ At the end, output:
 - list of files changed
 - 3 example commands demonstrating the inventory feature
 - confirm no breaking changes to existing YAML keys.
+
+
+==================================
+
+You have access to this repo, local intranet, and can run commands locally. 
+Goal: (1) verify tests for the Filtered Inventory feature, (2) add/strengthen tests if missing, (3) write a clear DEMO document (how to demo to the team), and (4) prepare commit-ready changes with a clean summary.
+
+Repo context (real):
+- Main script: enterprise-apigeex-applications/proxy-discovery/demo-discovery-tool.py
+- Filtered Inventory design is based on Andre’s comments:
+  - Proxy auth models: validAuthTypes (Excel column: "Esp ValidAuthTypes")
+  - Target auth models: validAuthTypesExt (ESP JSON; Excel may have endpoint auth fallback)
+- Excel sample input file is: apigee-proxies-export-2026-02-23-154847.xlsx (sheet: Proxies)
+
+SAFE DEFAULTS expected:
+- exact token matching, case-insensitive
+- no aliasing unless explicitly enabled
+- if both frontend and backend filters provided with scope=both => scope AND
+- JSON + CSV outputs should be created under output/<env>/
+
+Tasks:
+
+A) Testing
+1) Locate existing tests for inventory filtering (proxy-discovery/tests or similar).
+2) Run the tests and fix failures.
+3) If coverage is weak, add a small focused test suite for:
+   - OR filtering on frontend models
+   - AND filtering on frontend models
+   - scope=both with both frontend+backend filters => requires both to match
+   - exact vs partial match modes
+   - aliasing disabled by default
+   - mtlsEvidenceLevel classification:
+     - high when x509CertAlias exists
+     - medium when backend models contain "clientcert" (or "x509cert" if you normalized)
+     - low when frontend models contain "clientcert"
+4) Ensure tests do NOT depend on external ESP calls. Use small mocked datasets/dicts.
+
+B) Demo documentation
+Create a new doc:
+- enterprise-apigeex-applications/docs/apigee-discovery/DEMO_Filtered_Inventory.md
+
+It must include:
+1) One-paragraph overview of what was implemented (Filtered Inventory mode).
+2) Prerequisites (python version, dependencies, where Excel lives, optional ESP access).
+3) Demo script with exact commands to run in this order:
+   - show help
+   - run baseline inventory for an env from Excel
+   - run frontend filter OR
+   - run frontend filter AND
+   - show “high-confidence mTLS” proxies using x509 alias / mtlsEvidenceLevel
+   - optional: generate YAML for filtered results
+4) For each command, add: expected outputs + what to show on screen (CSV path, sample columns).
+5) Add a short “Known limitations” section:
+   - backend auth filtering may be incomplete from Excel unless ESP enrichment is enabled/available.
+
+C) Commit preparation
+1) Create/Update a CHANGELOG note section in the DEMO doc or add a separate short file:
+   - enterprise-apigeex-applications/docs/apigee-discovery/CHANGELOG_FilteredInventory.md
+   Include:
+   - what changed
+   - why
+   - files changed list
+   - how to run tests
+
+2) Provide the exact git commands (in the doc) to commit the changes:
+   - git status
+   - git diff
+   - git add <files>
+   - git commit -m "Add filtered inventory mode for proxy auth models"
+   - (optional) git push
+
+3) Ensure docs mention which files should be committed, including:
+   - demo-discovery-tool.py
+   - tests you added/modified
+   - docs you added/modified
+   - any schema changes if applicable
+
+Output requirements:
+- After edits, show me:
+  1) The list of files you changed/added
+  2) The commands you ran for tests
+  3) The final DEMO_Filtered_Inventory.md content
+Do not change unrelated modules.
+Keep code style consistent with repo.
