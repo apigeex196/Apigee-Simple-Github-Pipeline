@@ -381,3 +381,151 @@ Inspect:
 
 Then finish the implementation directly in this repo.
 Do not respond with “architecture is ready” unless `extract --use-verified ...` actually generates migration artifacts successfully.
+
+============================================================================================================
+
+Act as a senior Python architect working inside this repo. Do not stop at code inspection only. Execute the relevant demo commands in this repo, capture the actual outputs, and generate demo documentation that includes both Windows and macOS instructions.
+
+GOAL
+Prepare this repo for a live demo of the proxy-discovery refactor. I need:
+1. the scripts/commands to be executed for real where possible
+2. the actual console output documented
+3. a demo guide that works for both Windows and macOS users
+
+CONTEXT
+This repo now has three architectural layers:
+- inventory = heuristic / non-authoritative
+- verify = authoritative OPDK Management API verification
+- extract = migration artifact generation, preferably from verified data
+
+I need a demo-ready document that proves the flows and gives copy-paste commands for:
+- Windows PowerShell users
+- macOS terminal users
+
+IMPORTANT
+Do not just write hypothetical commands.
+Actually run the commands that can be run locally in this repo and capture the real outputs.
+If a command cannot be fully run because it depends on unavailable credentials, unavailable OPDK access, or missing files, then:
+- explain exactly why
+- still document the command
+- clearly label the expected output as “example / expected” instead of pretending it was run
+
+TASKS
+
+1) INSPECT DEMO READINESS
+Inspect the repo and identify:
+- demo-relevant commands for `inventory`, `verify`, and `extract`
+- required dependencies
+- required environment variables
+- any existing sample files or verified-summary.json examples that can be used
+- whether there are local demo-safe commands that do not require live OPDK access
+
+2) EXECUTE WHAT CAN ACTUALLY BE RUN
+Run as many of these as possible and document the real output:
+- help command
+- inventory command with a local/sample input if available
+- extract using a local verified-summary.json if available
+- tests related to the refactor if helpful for confidence
+
+Examples of commands that may be run if supported by the repo:
+- python proxy-discovery/tool/discover.py --help
+- python proxy-discovery/tool/discover.py inventory --help
+- python proxy-discovery/tool/discover.py verify --help
+- python proxy-discovery/tool/discover.py extract --help
+- python proxy-discovery/tool/discover.py inventory ...
+- python proxy-discovery/tool/discover.py extract --use-verified ...
+- pytest tests/test_three_layer_architecture.py
+
+Capture:
+- the exact command
+- whether it succeeded or failed
+- actual console output
+- any files generated
+
+3) DOCUMENT REAL OUTPUTS
+Create or update a demo document, such as:
+- DEMO_GUIDE.md
+or
+- docs/apigee-discovery/DEMO_GUIDE.md
+
+This document must contain:
+A. What was actually executed
+B. Actual console output blocks for commands that were run successfully
+C. Expected output blocks for commands that could not be run due to missing credentials or external dependencies
+D. Clear labels distinguishing “actual output” vs “expected output”
+
+4) SUPPORT BOTH WINDOWS AND MACOS
+For every demo command, provide:
+- Windows PowerShell version
+- macOS terminal/bash/zsh version
+
+Examples:
+- setting environment variables on Windows PowerShell
+- setting environment variables on macOS zsh/bash
+- path separator differences if relevant
+- file opening suggestions for both platforms
+
+5) VERIFY COMMAND / OPDK SECTION
+For `verify`, if live OPDK credentials are not available locally, do NOT fake execution.
+Instead:
+- document the exact env vars required:
+  OPDK_BASE_URL
+  OPDK_ORG
+  OPDK_ENV
+  OPDK_PROXY_NAME
+  OPDK_USER
+  OPDK_PASS
+- provide Windows and macOS examples for setting them
+- provide the verify command for both OSes
+- clearly label the verify output as expected if it could not be executed
+- if there is a stored verified-summary.json in the repo, mention that it can be used for extract demo without live OPDK access
+
+6) EXTRACT DEMO
+If a verified-summary.json sample exists, run extract using it and document:
+- command used
+- actual output
+- files generated
+- where `proxy.yaml` and summary files are written
+
+If no sample exists, document how to generate one via verify and clearly label extract as dependent on that step.
+
+7) ADD A SHORT “LIVE DEMO SCRIPT”
+In the doc, add a final section with a short presenter-friendly sequence:
+- 5 to 10 commands max
+- safest possible path for a live demo
+- clearly identify fallback plan if OPDK verify fails during demo
+
+8) ADD A “MAC USERS” SECTION
+Explicitly add a section:
+- Running the demo on macOS
+Include:
+- python3 vs python note if needed
+- pip vs pip3 note if needed
+- export commands
+- command examples using forward slashes
+- common mac issues and quick fixes
+
+9) HONESTY REQUIREMENT
+Do not claim a command was executed if it was not.
+Do not invent outputs.
+Label everything accurately:
+- “Actual output”
+- “Expected output”
+- “Could not run because ...”
+
+DELIVERABLES
+After completing the work, provide:
+1. list of commands actually executed
+2. summary of results
+3. path to the generated/updated demo documentation
+4. any commands that could not be run and why
+5. confirmation that both Windows and macOS instructions are included
+
+PREFERRED OUTPUT FORMAT IN DOC
+For each demo step use this format:
+
+## Step X - <name>
+
+### Windows PowerShell
+```powershell
+<command>
