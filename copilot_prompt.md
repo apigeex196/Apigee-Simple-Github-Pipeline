@@ -209,3 +209,175 @@ Before changing code, inspect the current repo and identify:
 Then implement the refactor directly in this repo.
 
 Do not just modify code silently. Update the repo docs so a reviewer can validate the refactor and run the demo without reading the source code.
+
+===================================================================================
+
+Act as a senior Python architect working inside this repo. Continue from the current refactor state. Do not restart from scratch. Finish the missing part of the three-layer architecture.
+
+CURRENT STATUS
+The repo already has:
+- models for InventoryProxyRecord / VerifiedProxyRecord / MigrationProxyRecord
+- OPDK verification client
+- verify command
+- docs describing the separation
+- warnings around inventory-based extraction
+
+But the critical gap remains:
+- extract from verified data is NOT fully implemented
+- discover.py currently says something like:
+  "Extract from verified data not yet fully implemented"
+- YAML generation still depends on old ESP/inventory-style flow
+- the real architectural fix is incomplete until verified OPDK data can actually drive extraction
+
+GOAL
+Finish the missing implementation so migration extraction and proxy.yaml generation can run from VerifiedProxyRecord / authoritative OPDK verification results, not only from heuristic inventory rows.
+
+NON-NEGOTIABLE REQUIREMENTS
+1. Do NOT remove the existing inventory flow.
+2. Do NOT break the existing extract flow for legacy/demo use.
+3. Add a proper verified extraction path that is authoritative-first.
+4. Keep warnings when users attempt extraction from non-authoritative inventory-only data.
+5. Reuse existing code where safe; refactor carefully rather than duplicating logic.
+
+WHAT TO IMPLEMENT
+
+1) COMPLETE VERIFIED EXTRACTION PATH
+Implement the missing logic in discover.py (or the appropriate extraction orchestration module) so that:
+- `extract --use-verified <path-to-verified-summary.json>` works end-to-end
+- it loads VerifiedProxyRecord
+- it converts verified data into the structure expected by migration generation
+- it generates migration artifacts from verified data
+- it does NOT stop with a placeholder or not-implemented message
+
+If the CLI currently expects a directory or file, standardize it clearly and document it.
+
+2) UPDATE YAML GENERATION TO SUPPORT VERIFIED INPUTS
+Inspect the existing YAMLGenerator / yaml generation module and modify it so it can accept:
+- VerifiedProxyRecord directly, or
+- a normalized migration model derived from VerifiedProxyRecord
+
+Do NOT fake ESP fields that do not exist.
+Do NOT silently pretend verified data contains everything inventory data had.
+Where data is missing:
+- generate warnings
+- include evidence/confidence metadata
+- continue best-effort where safe
+
+Expected verified-derived fields to map when available:
+- proxyName
+- revisions
+- deployedRevision
+- basePath
+- virtualHosts
+- environment
+- target/backend URLs
+- sourceType = "opdk-management"
+- authoritative = true
+
+3) CREATE A CLEAR TRANSFORMATION STEP
+Add a dedicated transformation layer/function such as:
+- verified_to_migration(...)
+or similar
+
+Purpose:
+- convert VerifiedProxyRecord -> MigrationProxyRecord
+- centralize field mapping
+- centralize warnings for missing fields
+- avoid spreading mapping logic across discover.py and YAMLGenerator
+
+MigrationProxyRecord should explicitly carry:
+- proxyName
+- basePath
+- targetUrls / backends
+- environment
+- revisions / deployedRevision
+- authoritative
+- sourceType
+- evidenceLevel / confidence
+- warnings list
+
+4) AUTHORITATIVE OUTPUT LABELING
+Any migration artifact generated from verified data must clearly include metadata showing:
+- sourceType: opdk-management
+- authoritative: true
+- confidence/evidence notes
+- warnings for any missing fields
+
+Any migration artifact generated from inventory-only data must clearly include metadata showing:
+- sourceType: inventory-heuristic
+- authoritative: false
+- warning that this output is not source-of-truth
+
+5) KEEP LEGACY FLOW, BUT MAKE IT HONEST
+If legacy extract from ESP/inventory still exists:
+- keep it working
+- label it clearly as heuristic / non-authoritative
+- do not let it masquerade as authoritative migration truth
+
+6) FILE OUTPUTS
+For verified extraction, generate outputs under a sensible structure, for example:
+output/extract/<proxyName>/<timestamp>/
+or reuse the current extract output structure if one already exists.
+
+Ensure output includes:
+- proxy.yaml
+- migration-summary.json (or similar)
+- warnings file if appropriate
+
+If verified-summary.json is the input, preserve traceability back to it.
+
+7) DOCS
+Update the existing docs to reflect the finished implementation:
+- how to run verify
+- how to run extract from verified data
+- how verified extraction differs from inventory extraction
+- what output files get created
+- which fields are authoritative vs best-effort
+- what limitations remain
+
+Update or add a demo doc with copy-paste commands for:
+- verify demo
+- extract from verified demo
+- extract from inventory demo
+- showing the warning difference between authoritative and heuristic outputs
+
+8) TESTS
+Add or update tests for:
+A. VerifiedProxyRecord -> MigrationProxyRecord transformation
+B. YAML generation from verified input
+C. extract --use-verified no longer stops with a placeholder
+D. output metadata marks authoritative=true for verified flow
+E. legacy inventory flow remains authoritative=false
+F. missing verified fields produce warnings, not fake values
+
+IMPLEMENTATION GUIDELINES
+- Inspect current YAMLGenerator instead of replacing it blindly
+- Reuse existing output structures where practical
+- Do not invent OPDK response fields that are not present
+- Prefer explicit transformation functions over ad hoc dict passing
+- Keep changes minimal but complete
+- Remove any placeholder message that says verified extraction is not yet implemented
+- Make the finished path actually runnable
+
+IMPORTANT
+Do not stop at “partial support.”
+Do not leave the repo in a state where docs claim verified extraction exists but the code still cannot generate proxy.yaml from verified input.
+
+DELIVERABLES
+After changes, provide:
+1. changed files list
+2. brief explanation of each change
+3. exact command to run verify
+4. exact command to run extract using verified-summary.json
+5. example expected output files
+6. honest remaining limitations
+
+FIRST STEP
+Inspect:
+- current discover.py extract flow
+- current YAMLGenerator interface
+- any existing not-implemented / placeholder branch for verified extraction
+- current output structure for extract
+
+Then finish the implementation directly in this repo.
+Do not respond with “architecture is ready” unless `extract --use-verified ...` actually generates migration artifacts successfully.
