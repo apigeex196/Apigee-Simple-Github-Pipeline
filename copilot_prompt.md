@@ -526,6 +526,173 @@ For each demo step use this format:
 
 ## Step X - <name>
 
-### Windows PowerShell
-```powershell
+### Windows PowerShellpowershell
 <command>
+============================================================
+
+Act as a senior Python engineer working inside this repository. Do not give high-level advice only. Make the code changes directly in the existing implementation, preserve current working behavior, and explain each changed file briefly at the end.
+
+GOAL
+Finish the inventory reporting feature so it fully implements Jeremy’s request from the meeting/transcript.
+
+CONTEXT
+The repo already has a working inventory/discovery flow in:
+- proxy-discovery/tool/discover.py
+There is already support for:
+- inventory command
+- --filter-frontend-auth
+- --filter-backend-auth
+- --scope frontend|backend|both
+- --filter-op OR|AND
+- --match exact|partial
+- normalized fields like frontendModels, backendModels, endpointAuthType, x509CertAlias
+- filtered-inventory.json / filtered-inventory.csv outputs
+- tests for inventory filtering
+
+IMPORTANT
+Do NOT break or remove the existing filtering/reporting behavior.
+Do NOT rewrite the architecture unnecessarily.
+Do NOT remove existing commands, flags, or output files.
+Add the missing reporting capability on top of the current implementation.
+
+JEREMY’S EXACT ASK TO IMPLEMENT
+He asked for:
+1. A count of all the different proxy security types
+2. A count of all the different endpoint security types
+3. Both internal and external prod views
+4. Lists containing proxy names and sys gens
+5. Preferably sorted by sys gen
+6. Four lists total:
+   - Proxy Security / Prod Internal
+   - Proxy Security / Prod External
+   - Endpoint Security / Prod Internal
+   - Endpoint Security / Prod External
+
+WHAT IS MISSING TODAY
+Based on current code:
+- There is no grouped summary count by security type
+- There is no dedicated four-list report output
+- sysgen is not included in the inventory output/report
+- there is no sort-by-sysgen reporting
+- prod internal vs prod external split is not generated as a dedicated report
+
+TASK
+Implement the missing functionality in the existing tool.
+
+REQUIREMENTS
+
+1) Add a new reporting mode for security summaries
+Implement a new CLI option or sub-report in the existing inventory workflow that generates Jeremy’s requested summary outputs.
+Prefer minimal CLI change. If appropriate, add a flag like:
+--security-summary
+or similar.
+Keep existing command behavior backward compatible.
+
+2) Generate four explicit report sections / files
+Produce structured outputs for:
+- proxy_security_prod_internal
+- proxy_security_prod_external
+- endpoint_security_prod_internal
+- endpoint_security_prod_external
+
+Each section must contain:
+- security type
+- count
+- list of proxies
+- sysgen value if available
+- sorted by sysgen, then proxy name
+
+3) Define proxy security vs endpoint security clearly from existing normalized fields
+Use existing normalized data rather than inventing new heuristics unless required.
+Suggested interpretation:
+- proxy security = frontendModels
+- endpoint security = backendModels and/or endpointAuthType
+If both backendModels and endpointAuthType exist, use a documented and deterministic merge/normalization strategy.
+Document this in code comments.
+
+4) Internal vs external prod split
+Use existing normalized record fields such as org/env and current repo conventions.
+Find the correct current convention in this repo and implement it consistently.
+Do NOT hardcode unsupported assumptions silently.
+If the source data identifies prod/internal/external differently, normalize it in one helper and reuse that helper.
+Be explicit in code comments how a record is classified into:
+- prod internal
+- prod external
+If classification cannot be determined for a row, do not include it in those four prod reports unless current repo rules say otherwise.
+
+5) sysgen support
+Find where sysgen exists in source/normalized records.
+If it already exists somewhere upstream, carry it through normalization and include it in:
+- filtered inventory outputs
+- summary outputs
+If not currently propagated but present in source records, add it cleanly.
+Do NOT invent fake sysgen values.
+If missing for a row, keep it blank/null.
+
+6) Output format
+In addition to existing filtered-inventory.json/csv behavior, generate summary outputs like:
+- security-summary.json
+- security-summary.csv
+or similar consistent names.
+
+JSON should be easy to read and structured by the four required report groups.
+
+CSV can either be:
+- one flattened file with columns like reportGroup, securityType, sysgen, proxyName
+and/or
+- a grouped summary CSV with count rows
+Choose the cleanest approach, but make it usable for audit/reporting.
+
+7) Sorting
+Jeremy asked “preferably sorted by sys gen”.
+Ensure lists are sorted by:
+- sysgen ascending
+- proxyName ascending
+Handle missing sysgen deterministically.
+
+8) Tests
+Add or update tests to verify:
+- four report groups are generated
+- counts by security type are correct
+- sysgen is preserved in output
+- sorting by sysgen works
+- records are split correctly into prod internal vs prod external
+- existing inventory filtering tests still pass
+
+9) Preserve existing behavior
+Existing inventory command usage and tests must continue to work.
+Do not regress current JSON/CSV exports.
+
+10) Deliverables
+At the end, provide:
+- exact files changed
+- short summary per file
+- example CLI command to run the new summary report
+- example of expected output structure
+
+IMPLEMENTATION GUIDANCE
+Please inspect current code first before editing:
+- normalization pipeline
+- inventory export path
+- CSV/JSON writers
+- tests under proxy-discovery/tests/
+- any place where sysgen/internal/external/prod mapping already exists
+
+Prefer adding small helper functions instead of large rewrites.
+Prefer reusing existing normalized record structures.
+Keep naming consistent with the current codebase.
+
+QUALITY BAR
+- production-safe
+- no placeholder code
+- no pseudocode
+- no TODOs left unfinished
+- minimal, clean diff
+- tests included
+
+Also, before making changes, briefly state:
+1. which existing function(s) you will extend
+2. where sysgen/internal-external/prod classification currently comes from
+3. what exact new CLI/output surface you will add
+
+Then implement the full change.
