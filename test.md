@@ -1,11 +1,11 @@
-python tool/discover.py inventory `
+python -X utf8 tool/discover.py inventory `
   --env prod `
-  --source esp `
   --out output-both-mtls `
+  --source excel `
+  --excel "tmp/apigee-proxies-export-2026-02-23-154847.xlsx" `
   --filter-frontend-auth "clientcert,x509cert" `
   --filter-backend-auth "clientcert,x509cert,mtls" `
   --filter-op OR `
   --scope both `
   --match exact `
-  --security-summary `
-  --insecure
+  --security-summary
