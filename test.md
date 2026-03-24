@@ -1,11 +1,1 @@
-python -X utf8 tool/discover.py inventory `
-  --env prod `
-  --out output-both-mtls `
-  --source excel `
-  --excel "tmp/apigee-proxies-export-2026-02-23-154847.xlsx" `
-  --filter-frontend-auth "clientcert,x509cert" `
-  --filter-backend-auth "clientcert,x509cert,mtls" `
-  --filter-op OR `
-  --scope both `
-  --match exact `
-  --security-summary
+I ran the proxy discovery using the Excel source and generated the security summary based on ESP data fields. I filtered proxies using clientcert (mTLS indicator) on the frontend and produced the summary output. The results are available in the attached security-summary.json and CSV files. Let me know if you’d like a breakdown of proxies with mTLS on proxy side, target side, or both.
