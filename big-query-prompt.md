@@ -1,191 +1,192 @@
-Help me set up and test Google BigQuery access in Python using a service account JSON key.
+You are a senior Python/GitHub Actions engineer working inside my existing repository.
 
-Context:
-- I already have the BigQuery service account JSON key file locally
-- I want to create a Python script named test_bigquery.py
-- I want to use environment variables, not hardcoded secrets
-- The environment variables are:
-  - GOOGLE_APPLICATION_CREDENTIALS = full path to the JSON key file
-  - BQ_PROJECT_ID = Google Cloud project id
-- I want to run this from VS Code terminal on Windows PowerShell
+Your job is to inspect this project and implement BigQuery sync for API PRODUCT metadata only.
 
-Tasks:
-1. Generate a complete Python file named test_bigquery.py
-2. Use package: google-cloud-bigquery
-3. Do NOT hardcode any secrets
-4. Read:
-   - GOOGLE_APPLICATION_CREDENTIALS from environment
-   - BQ_PROJECT_ID from environment
-5. The script must:
-   - print whether GOOGLE_APPLICATION_CREDENTIALS is set
-   - print whether BQ_PROJECT_ID is set
-   - verify whether the credentials file exists
-   - connect to BigQuery
-   - list all datasets in the project
-   - for each dataset, list all tables
-   - run a test query: SELECT 1 AS ok
-   - print clean readable output
-   - handle errors cleanly
-   - distinguish as much as possible between:
-     - missing env vars
-     - missing file path
-     - invalid credentials
-     - permission denied
-     - project not found
-     - dataset/table errors
-   - never print private key contents
-6. Add a main() function and make the script runnable from terminal
-7. Also show the exact pip install command
-8. Also show the exact Windows PowerShell commands to set:
-   - GOOGLE_APPLICATION_CREDENTIALS
-   - BQ_PROJECT_ID
-9. Also show how to verify the variables in PowerShell using echo
-10. Keep the code clean, production-style, and fully copy-paste ready
+IMPORTANT BUSINESS CONTEXT
+- This repository supports GitOps flow for API Products.
+- Jira requirement:
+  - API Producers define API Product config in Git
+  - pipeline triggers on product config changes
+  - pipeline performs Create / Update / Delete on API Products
+  - product is deployed to Apigee X and OPDK
+  - after successful deployment, product metadata is updated in BigQuery
+- BigQuery sync is ONLY for API PRODUCT metadata
+- This task is NOT about proxy discovery
+- Do NOT add proxy extraction or proxy BigQuery tables
+- Do NOT sync developer apps or developers in this task
 
-Important:
-- Assume Windows path example like:
-  C:\keys\sa-bigquery.json
-- Assume project id example like:
-  gcp-prj-apigee-dev-np-01
-- Output full code, not partial snippets
-- After the code, also provide:
-  - pip install command
-  - PowerShell commands to set env vars
-  - command to run the script
+BIGQUERY TARGET
+Project ID:
+- gcp-prj-apigee-dev-np-01
 
-Expected example commands to include:
-- pip install google-cloud-bigquery
-- $env:GOOGLE_APPLICATION_CREDENTIALS="C:\keys\sa-bigquery.json"
-- $env:BQ_PROJECT_ID="gcp-prj-apigee-dev-np-01"
-- echo $env:GOOGLE_APPLICATION_CREDENTIALS
-- echo $env:BQ_PROJECT_ID
-- python test_bigquery.py
+Dataset:
+- api_products
+
+Target table:
+- choose the correct table already used by this repo flow, likely one of:
+  - external_products
+  - internal_products
+
+If selection between external_products and internal_products is based on product access/exposure, inspect the project and implement the correct mapping.
+
+BIGQUERY TABLE SCHEMA
+The target product table has these 11 columns:
+
+1. name STRING REQUIRED
+2. display_name STRING NULLABLE
+3. description STRING NULLABLE
+4. environments STRING REPEATED
+5. attributes JSON NULLABLE
+6. proxies STRING REPEATED
+7. auto_approval BOOLEAN NULLABLE
+8. sysgen STRING NULLABLE
+9. owner_email_address STRING NULLABLE
+10. consumer_exposure STRING NULLABLE
+11. raw_object JSON NULLABLE
+
+WHAT TO INSERT
+Map product GitOps config / deployed product state into these columns:
+
+- name -> metadata.name
+- display_name -> spec.displayName if present else metadata.name
+- description -> metadata.description
+- environments -> spec.environments
+- attributes -> spec.attributes as JSON
+- proxies -> spec.proxies as repeated string array
+- auto_approval -> boolean derived from spec.approval == "auto"
+- sysgen -> metadata.sysgen
+- owner_email_address -> map from config if present, otherwise null unless there is an existing reliable source in repo
+- consumer_exposure -> derive from the repo’s product access/exposure field, likely from spec.access or equivalent
+- raw_object -> full sanitized product object as JSON
+
+STRICT RULES
+- Do NOT insert secrets or credentials
+- Do NOT insert consumer keys
+- Do NOT insert consumer secrets
+- Do NOT touch proxy discovery code for this task
+- Do NOT create a new BigQuery schema if the existing table already matches
+- Reuse the existing api_products table structure
+- Keep the current deployment behavior intact
+- BigQuery update must happen only AFTER successful deployment to required targets
+- BigQuery should reflect accurate final deployed state
+
+DELETE BEHAVIOR
+- Jira requires Create / Update / Delete
+- Inspect current repo and determine whether delete flow exists
+- If delete flow exists, implement matching BigQuery delete
+- If delete flow does not yet exist, clearly identify the gap and implement the BigQuery side in the safest way possible based on current structure
+- Prefer real delete from BigQuery if there is no status column in schema
+
+YOUR TASKS
+1. Inspect the repository and identify:
+   - the GitHub workflow for product deployment
+   - the composite action / script used for product deployment
+   - the product schema/config file
+   - where product YAML is parsed
+   - where create/update/delete decisions are made
+   - the best integration point for BigQuery sync
+
+2. Summarize the files and functions you found before writing code.
+
+3. Implement BigQuery sync with minimal safe changes.
+
+4. Add code to:
+   - build a BigQuery row from the product config / deployed product payload
+   - choose the right target table (external_products or internal_products)
+   - insert row on create
+   - update row on update
+   - delete row on delete if product is deleted
+
+5. Use the official Python BigQuery client if Python is already used in this flow.
+   If this workflow is shell-based and another language is more natural in the repo, inspect first and choose the best fit. But prefer the smallest safe change.
+
+6. Add proper logging for:
+   - product name
+   - operation type
+   - selected BigQuery dataset/table
+   - BigQuery success/failure
+   - rows inserted/updated/deleted
+
+7. Make configuration environment-driven where appropriate:
+   - BQ_PROJECT_ID default gcp-prj-apigee-dev-np-01
+   - BQ_DATASET default api_products
+
+8. Keep code production-ready and repo-aligned.
+   Do not invent non-existing fields unless clearly marked optional/null.
+
+EXPECTED OUTPUT
+Please generate:
+1. the exact files to modify
+2. the code changes
+3. any new helper module/script needed
+4. any requirements/dependency updates
+5. a short explanation of how the flow works now
+
+IMPLEMENTATION GUIDANCE
+- First inspect existing files such as:
+  - .github/workflows/deploy-products.yml
+  - .github/actions/deploy-product/action.yml
+  - apiproduct.schema.json
+  - any product scripts/helpers
+- Reuse existing parsed product payload rather than reparsing from scratch if possible
+- If a full deployed Apigee response object is available after deployment, prefer using that for raw_object
+- If not available, use the sanitized Git product object as raw_object
+- For repeated BigQuery fields, ensure arrays are passed correctly
+- For JSON fields, pass valid JSON/dict objects in the format expected by the BigQuery client
+
+VERY IMPORTANT
+Before coding:
+- tell me exactly which files you inspected
+- show where the BigQuery integration point should be
+- explain how you will map each of the 11 BigQuery columns
+Then generate the code.
+Do not give placeholders. Generate real repo-fitting code.
 
 
 
-========================================================
+=============================
 
-Hi Shimmy,
+Follow-up prompt after Copilot inspects the repo
 
-It looks like the email containing the service account key is restricted (IRM enabled), and I’m unable to copy or extract the JSON content. 
+Use this right after the first prompt:
 
-Could you please share the service account key as:
-- a .json file attachment, OR
-- a secure download link (Drive / OneDrive / etc.)
 
-Currently, the permissions prevent copying, so I can’t use the key for integration.
-========================================================
+Now implement the change with the smallest safe diff.
 
-You are a senior Python data engineer.
+Rules:
+- do not rewrite the product deployment flow
+- extend it only
+- keep existing behavior intact
+- BigQuery sync must run only after successful deployment
+- use the existing product object already available in the workflow/action
+- for update, merge by product name
+- for delete, remove the row from BigQuery if the product is deleted and no status column exists
+- choose external_products vs internal_products using the repo’s existing access/exposure logic
+- if owner_email_address is not reliably available, write null and document it clearly
+- raw_object must be the full sanitized product object JSON
 
-Create a production-style Python script named `inspect_bigquery_apigee.py` that connects to Google BigQuery using service account credentials from the environment and helps analyze an existing Apigee-to-BigQuery setup.
+Show me:
+1. exact files changed
+2. exact code added
+3. how create/update/delete are handled
+4. how each BigQuery column is populated
 
-Context:
-- BigQuery authentication is already working in my environment.
-- Project ID: `gcp-prj-apigee-dev-np-01`
-- Existing datasets found:
-  - `api_products`
-  - `dev_apps`
-  - `developers`
-- Existing tables found:
-  - `api_products.external_products`
-  - `api_products.internal_products`
-  - `dev_apps.external_devapps`
-  - `dev_apps.internal_devapps`
-  - `developers.external_devs`
-  - `developers.internal_devs`
 
-Goal:
-I want a Python script that inspects these datasets and tables and helps answer:
-1. Can we reuse these existing datasets/tables?
-2. Are they likely part of the existing ingestion pipeline?
-3. What schema do they have?
-4. Do they contain potentially sensitive fields such as:
-   - consumerKey
-   - consumerSecret
-   - apiKey
-   - secret
-   - token
-   - password
-   - credential
-5. Should we create new tables only for derived/custom application data?
+
+======================================
+Create a helper script/module for BigQuery product sync that fits this repo.
+
+It must provide functions like:
+- build_bigquery_product_row(product_config: dict) -> dict
+- determine_product_table(product_config: dict) -> str
+- upsert_product_metadata(row: dict, table_name: str) -> None
+- delete_product_metadata(product_name: str, table_name: str) -> None
 
 Requirements:
-1. Use Python.
-2. Use the official `google-cloud-bigquery` package.
-3. Read credentials using normal Google auth resolution:
-   - `GOOGLE_APPLICATION_CREDENTIALS`
-   - or default application credentials
-4. Keep the script runnable from terminal:
-   - `python inspect_bigquery_apigee.py`
-5. Use clear functions with good naming and comments.
-6. Add error handling for:
-   - authentication failure
-   - project access errors
-   - dataset/table not found
-   - query errors
-7. Print clean console output with sections.
+- project: gcp-prj-apigee-dev-np-01
+- dataset: api_products
+- tables: external_products / internal_products
+- schema:
+  name, display_name, description, environments, attributes, proxies, auto_approval, sysgen, owner_email_address, consumer_exposure, raw_object
 
-Script behavior:
-1. Connect to BigQuery for project `gcp-prj-apigee-dev-np-01`
-2. Verify access by running:
-   - `SELECT 1 AS ok`
-3. For each dataset:
-   - check existence
-   - list tables
-4. For each table:
-   - print full schema:
-     - column name
-     - type
-     - mode
-   - detect suspicious/sensitive column names using case-insensitive matching against:
-     - consumerkey
-     - consumersecret
-     - apikey
-     - secret
-     - token
-     - password
-     - credential
-   - fetch row count using a safe query
-   - fetch 3 sample rows
-   - print sample rows in a readable but truncated format
-5. Generate a final recommendation section:
-   - If tables already exist and names match apps/products/developers, print that these are likely reusable core pipeline tables.
-   - If suspicious columns are found, warn that data should be sanitized and those fields should not be newly inserted into BigQuery.
-   - Recommend using existing datasets for existing pipeline entities.
-   - Recommend creating separate new tables only for:
-     - derived analytics
-     - migration tracking
-     - custom application-specific processed outputs
-6. Output a structured summary like:
-   - Connection status
-   - Datasets status
-   - Tables inspected
-   - Sensitive columns found
-   - Reuse vs create recommendation
-
-Implementation details:
-- Use `bigquery.Client(project=PROJECT_ID)`
-- Use dataset and table metadata APIs where possible
-- Use SQL only where helpful for counts/sample rows
-- Truncate long field values in sample rows to avoid dumping huge JSON
-- Make the code modular with functions like:
-  - `get_client()`
-  - `test_connection()`
-  - `list_dataset_tables()`
-  - `get_table_schema()`
-  - `find_sensitive_columns()`
-  - `get_row_count()`
-  - `get_sample_rows()`
-  - `print_final_recommendation()`
-- Include a `main()` function and `if __name__ == "__main__":`
-
-Also generate:
-1. a `requirements.txt` file containing needed dependencies
-2. a short README section at the top of the script as a docstring explaining:
-   - how to install dependencies
-   - how to set `GOOGLE_APPLICATION_CREDENTIALS`
-   - how to run the script
-
-Make the code real, complete, and runnable. Do not leave placeholders like "implement later".
-
+Use real code, error handling, logging, and repo-appropriate style.
