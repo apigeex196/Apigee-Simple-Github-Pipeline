@@ -60,3 +60,18 @@ Expected example commands to include:
 - echo $env:GOOGLE_APPLICATION_CREDENTIALS
 - echo $env:BQ_PROJECT_ID
 - python test_bigquery.py
+
+
+
+========================================================
+
+Hi Shimmy,
+
+It looks like the email containing the service account key is restricted (IRM enabled), and I’m unable to copy or extract the JSON content. 
+
+Could you please share the service account key as:
+- a .json file attachment, OR
+- a secure download link (Drive / OneDrive / etc.)
+
+Currently, the permissions prevent copying, so I can’t use the key for integration.
+
