@@ -182,6 +182,19 @@ It must provide functions like:
 - upsert_product_metadata(row: dict, table_name: str) -> None
 - delete_product_metadata(product_name: str, table_name: str) -> None
 
+
+
+Hi Team,
+
+I’ve raised a PR for BigQuery product sync implementation:
+PR: Feat/bigquery product sync (#202)
+
+This adds metadata sync to BigQuery after successful product deployment.
+
+Could you please review and approve when you get a chance?
+
+Thanks!
+
 Requirements:
 - project: gcp-prj-apigee-dev-np-01
 - dataset: api_products
