@@ -1,109 +1,43 @@
-You are editing the currently open markdown document.
+You are editing the currently open markdown file for the API Producer guide.
 
-Focus ONLY on the "Quickstart (Windows)" section.
+Focus ONLY on the sections in "Authoring Proxies" that discuss `spec.template`, the minimal example, the template decision tree, and the first proxy walkthrough.
 
-There are two PR comments:
+Reviewer comments say:
+"Needs to be updated to reflect the 'single proxy template'."
 
-1) "This section could use some more instructions on how to set those..."
-2) "This section is confusing. It looks like you're mixing commands and yaml text... Is that example even needed here?"
+Important context from the current repository:
+- The repo still technically supports multiple templates in `template-mappings.json` and `apiproxy.schema.json`
+- BUT this documentation should present a single standard template for API producers
+- Do NOT change repository code, schema references, or template-mappings.json
+- Only update the documentation guidance
 
-----------------------------------------
+Your task:
+1. Update all producer-facing guidance to use the single standard proxy template:
+   `apigee-default-proxy-v1`
 
-GOAL:
+2. In the "Required fields" section, change the description of `spec.template` so it no longer says to choose from multiple templates. Replace it with guidance to use:
+   `apigee-default-proxy-v1`
 
-Make this section:
-- Human-readable
-- Step-by-step actionable
-- Minimal (true Quickstart)
-- Free of confusion
+3. In the minimal YAML example, replace:
+   `template: oauth-proxy-oauth-backend`
+   with:
+   `template: apigee-default-proxy-v1`
 
-----------------------------------------
+4. Remove the entire "Template decision tree" section or replace it with a short statement that API producers should use the standard template:
+   `apigee-default-proxy-v1`
 
-REQUIRED CHANGES:
+5. In the "First proxy walkthrough", replace wording like:
+   "Choose a template and set spec.template ..."
+   with direct wording like:
+   "Set spec.template to `apigee-default-proxy-v1` ..."
 
-### 1. VARIABLE SETUP (Fix clarity + intent)
+6. Keep any reference to `template-mappings.json` only if needed as a neutral reference, but do NOT present it as a producer decision point.
 
-Before the variable block:
+7. Do NOT say that only one template exists in the repository.
+8. Do NOT mention all alternative template names.
+9. Do NOT rewrite unrelated sections.
 
-- Add a short explanation:
-  - What these variables are used for (building paths and names)
-  - That they must be set before running commands
-  - That they are set in a PowerShell session
-
-- Clearly list ALL variables:
-  $sysgen, $team, $stage, $visibility, $envName, $project, $root
-
-- Add:
-  - Note: variables are temporary unless added as Windows User Environment Variables
-  - Microsoft Docs link for PowerShell variables
-
-----------------------------------------
-
-### 2. SIMPLIFY QUICKSTART (CRITICAL)
-
-Rewrite Quickstart as a **clean sequence of steps**:
-
-Step 1: Set variables  
-Step 2: Create folder  
-Step 3: Create proxy.yaml file  
-Step 4: Paste YAML  
-Step 5: Commit → PR → Merge  
-
-- No extra explanation blocks
-- No branching paths
-- No optional steps
-
-----------------------------------------
-
-### 3. REMOVE COMMAND + YAML MIXING
-
-- REMOVE usage of:
-  Set-Content @"...yaml..."
-
-- Instead:
-  - Show YAML as a standalone ```yaml block
-  - Add instruction:
-    "Save this as proxy.yaml in the path defined above"
-
-----------------------------------------
-
-### 4. REMOVE OR RELOCATE VALIDATION
-
-- REMOVE "Validate locally" from Quickstart
-- Create new section:
-
-## Optional: Local Validation
-
-- Move all validation commands there
-- Keep content unchanged
-
-----------------------------------------
-
-### 5. REMOVE REDUNDANT / CONFUSING EXAMPLES
-
-- If multiple ways exist to do the same thing → keep only ONE clear method
-- Prefer manual file creation over scripted generation
-
-----------------------------------------
-
-### 6. KEEP STRICT BOUNDARIES
-
-DO NOT:
-- Modify technical logic
-- Change YAML structure
-- Change paths
-- Add new concepts
-
-----------------------------------------
-
-OUTPUT:
-
-Return ONLY:
-1. Updated "Quickstart (Windows)" section
-2. New "Optional: Local Validation" section
-
-Ensure:
-- Clean formatting
-- Clear steps
-- Beginner-friendly tone
-- No mixing of concepts
+Output:
+- Return only the revised markdown blocks that should be changed
+- Preserve formatting style of the current document
+- Keep wording simple, human-readable, and suitable for API producers
