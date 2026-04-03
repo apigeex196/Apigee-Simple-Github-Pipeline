@@ -1,43 +1,38 @@
-You are editing the currently open markdown file for the API Producer guide.
+Review the currently open markdown file and make a final cleanup for the recent template-related documentation changes.
 
-Focus ONLY on the sections in "Authoring Proxies" that discuss `spec.template`, the minimal example, the template decision tree, and the first proxy walkthrough.
+Context:
+The goal was to update producer-facing documentation to reflect a single standard proxy template for API producers:
+`apigee-default-proxy-v1`
 
-Reviewer comments say:
-"Needs to be updated to reflect the 'single proxy template'."
+I already made these changes:
+- changed `spec.template` guidance to use `apigee-default-proxy-v1`
+- updated the minimal YAML example to use `template: apigee-default-proxy-v1`
+- removed the multi-template decision tree
+- updated the walkthrough to say `Set spec.template to apigee-default-proxy-v1`
 
-Important context from the current repository:
-- The repo still technically supports multiple templates in `template-mappings.json` and `apiproxy.schema.json`
-- BUT this documentation should present a single standard template for API producers
-- Do NOT change repository code, schema references, or template-mappings.json
-- Only update the documentation guidance
+Now do a final pass and fix any leftover issues.
 
-Your task:
-1. Update all producer-facing guidance to use the single standard proxy template:
-   `apigee-default-proxy-v1`
+Tasks:
+1. Find and remove any old or conflicting wording that still suggests API producers should choose from multiple templates.
+   Examples of wording to remove or replace:
+   - "a valid template name from template-mappings.json"
+   - "Choose a template"
+   - any remaining multi-template guidance aimed at API producers
 
-2. In the "Required fields" section, change the description of `spec.template` so it no longer says to choose from multiple templates. Replace it with guidance to use:
-   `apigee-default-proxy-v1`
+2. Keep producer-facing guidance consistent with this rule:
+   - API producers should use the standard template `apigee-default-proxy-v1`
 
-3. In the minimal YAML example, replace:
-   `template: oauth-proxy-oauth-backend`
-   with:
-   `template: apigee-default-proxy-v1`
+3. If `template-mappings.json` is still referenced, make the wording neutral and non-decision-oriented.
+   Good direction:
+   - "Supported templates are defined in template-mappings.json"
+   - do not imply that API producers need to choose among them
 
-4. Remove the entire "Template decision tree" section or replace it with a short statement that API producers should use the standard template:
-   `apigee-default-proxy-v1`
+4. Keep the wording simple and human-readable.
+   Avoid adding extra technical detail.
 
-5. In the "First proxy walkthrough", replace wording like:
-   "Choose a template and set spec.template ..."
-   with direct wording like:
-   "Set spec.template to `apigee-default-proxy-v1` ..."
-
-6. Keep any reference to `template-mappings.json` only if needed as a neutral reference, but do NOT present it as a producer decision point.
-
-7. Do NOT say that only one template exists in the repository.
-8. Do NOT mention all alternative template names.
-9. Do NOT rewrite unrelated sections.
+5. Do not modify unrelated sections.
+6. Do not change schema references, repo logic, or code examples outside the relevant template guidance.
 
 Output:
-- Return only the revised markdown blocks that should be changed
-- Preserve formatting style of the current document
-- Keep wording simple, human-readable, and suitable for API producers
+- Return only the revised markdown lines/blocks that need to change
+- Keep formatting consistent with the existing document
